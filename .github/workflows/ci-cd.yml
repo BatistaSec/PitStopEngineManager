@@ -1,0 +1,88 @@
+name: PitStopEngine CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  # 🏎️ Job 1: Build & Test Core Championship Service (Java 21 + Spring Boot)
+  core-championship-ci:
+    name: Build & Test Core Championship (Java 21)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run Maven Unit & Integration Tests
+        run: |
+          cd services/core-championship
+          mvn clean test --batch-mode
+
+      - name: Build Production JAR Package
+        run: |
+          cd services/core-championship
+          mvn package -DskipTests --batch-mode
+
+      - name: Upload Core Championship Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-championship-service
+          path: services/core-championship/target/*.jar
+          retention-days: 7
+
+  # 💻 Job 2: Build & Verify Frontend (Next.js + TypeScript)
+  frontend-ci:
+    name: Build & Verify Frontend (Next.js)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci || npm install
+
+      - name: Verify Frontend Build
+        run: |
+          cd frontend
+          npm run build
+
+  # 🐳 Job 3: Verify Docker Compose Configuration
+  docker-infra-ci:
+    name: Verify Docker Infra & Compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose config
