@@ -3,11 +3,13 @@
 [![Repository](https://img.shields.io/badge/GitHub-BatistaSec%2FPitStopEngineManager-181717?logo=github)](https://github.com/BatistaSec/PitStopEngineManager)
 [![Java](https://img.shields.io/badge/Java-21_LTS-ED8B00?logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.3-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Security](https://img.shields.io/badge/Spring_Security-JWT-6DB33F?logo=springsecurity&logoColor=white)](https://spring.io/projects/spring-security)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600?logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/BatistaSec/PitStopEngineManager)) é uma plataforma de alta performance desenvolvida em arquitetura distribuída de microserviços. O sistema combina gestão oficial de campeonatos de Fórmula 1, processamento de telemetria em tempo real via WebSockets, inteligência artificial preditiva para estratégias de pit stop e dashboards dinâmicos no estilo *Pit Wall*.
+O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/BatistaSec/PitStopEngineManager)) é uma plataforma de alta performance desenvolvida em arquitetura distribuída de microserviços. O sistema combina gestão oficial de campeonatos de Fórmula 1, autenticação JWT via Spring Security 6, mensageria de eventos em tempo real com RabbitMQ e dashboards dinâmicos no estilo *Pit Wall*.
 
 📍 **Repositório Oficial:** [github.com/BatistaSec/PitStopEngineManager](https://github.com/BatistaSec/PitStopEngineManager)
 
@@ -17,7 +19,7 @@ O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/Batist
 
 | Semana | Módulo / Serviço | Tecnologias | Status |
 | :--- | :--- | :--- | :---: |
-| **Semana 1** | **Core Championship Service** | Java 21, Spring Boot 3, PostgreSQL, JPA, JUnit 5, Swagger | `Concluído` ✅ |
+| **Semana 1** | **Core Championship & Security** | Java 21, Spring Boot 3, Spring Security 6 (JWT), RabbitMQ, PostgreSQL, JUnit 5, Swagger | `Concluído` ✅ |
 | **Semana 2** | **Frontend Pit Wall** | Next.js, React, TypeScript, TailwindCSS, Chart.js / Recharts | `Próximo` ⏳ |
 | **Semana 3** | **Telemetria Streamer** | Node.js, Express / NestJS, WebSockets, MySQL | `Pendente` 🎯 |
 | **Semana 4** | **Predictive AI Engine** | Python, FastAPI, Scikit-Learn, Pandas | `Pendente` 🎯 |
@@ -25,61 +27,225 @@ O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/Batist
 
 ---
 
-## ✅ O Que Já Foi Feito (Concluído)
+## 📚 Documentação das APIs REST (`/api/v1`)
 
-### 🏎️ Semana 1: Core Championship (`services/core-championship`)
-- **Arquitetura de Domínio F1:**
-  - `Team`: Cadastro de escuderias (Scuderia Ferrari, Red Bull Racing, McLaren, etc.).
-  - `Driver`: Pilotos com identificadores únicos da FIA, números permanentes e dados biométricos.
-  - `Circuit`: Circuito, extensão em quilômetros, localização e contagem de voltas.
-  - `Race`: Agendamento de Grandes Prêmios por temporada e rodada.
-  - `RaceResult`: Resultados oficiais das corridas, posições de largada/chegada e tempos de volta rápida.
-- **Regras de Negócio Oficiais da FIA F1:**
-  - Calculadora de Pontuação [F1PointsCalculator](services/core-championship/src/main/java/com/pitstopengine/core/service/F1PointsCalculator.java): Pontuação oficial (25, 18, 15, 12, 10, 8, 6, 4, 2, 1).
-  - Regra de +1 ponto de bônus por **Volta Mais Rápida** (*Fastest Lap*) exclusivamente para pilotos que terminam no Top 10.
-  - Cálculo dinâmico e em tempo real das tabelas de classificação de **Pilotos** e **Construtores (Equipes)** com desempate por vitórias e pódios.
-- **RESTful API & Documentação Interativa:**
-  - Endpoints REST completos para `/api/v1/teams`, `/api/v1/drivers`, `/api/v1/circuits`, `/api/v1/races` e `/api/v1/standings`.
-  - Swagger UI e OpenAPI 3 integrados (`/swagger-ui.html`).
-- **Validação & Testes:**
-  - Cobertura de testes unitários com JUnit 5 e AssertJ [ChampionshipServiceTest](services/core-championship/src/test/java/com/pitstopengine/core/service/ChampionshipServiceTest.java) validados com 100% de sucesso.
+### 🔐 1. Autenticação & Usuários (`/api/v1/auth`)
+
+#### `POST /api/v1/auth/register` — Registrar Novo Usuário
+- **Permissão:** Pública
+- **Payload Request:**
+  ```json
+  {
+    "username": "admin_f1",
+    "email": "admin@pitstopengine.com",
+    "password": "supersecretpassword",
+    "role": "ROLE_ADMIN"
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+    "tokenType": "Bearer",
+    "username": "admin_f1",
+    "role": "ROLE_ADMIN"
+  }
+  ```
+
+#### `POST /api/v1/auth/login` — Autenticar & Obter Token JWT
+- **Permissão:** Pública
+- **Payload Request:**
+  ```json
+  {
+    "username": "admin_f1",
+    "password": "supersecretpassword"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+    "tokenType": "Bearer",
+    "username": "admin_f1",
+    "role": "ROLE_ADMIN"
+  }
+  ```
 
 ---
 
-## 🔮 O Que Vai Ser Feito (Próximas Etapas)
+### 🏎️ 2. Escuderias / Teams (`/api/v1/teams`)
 
-### 💻 Semana 2 – Frontend (Next.js + React + TypeScript)
-- Portal do Campeonato: Tabelas de classificação de Pilotos/Construtores ao vivo e fichas técnicas.
-- Dashboard *Pit Wall*: Gráficos interativos em tempo real exibindo a telemetria dos carros na pista.
-- Design System responsivo com Dark Mode neon/carbon fiber inspirado na F1.
+#### `GET /api/v1/teams` — Listar Todas as Escuderias
+- **Permissão:** Pública
+- **Response (200 OK):**
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "Scuderia Ferrari",
+      "country": "Italy",
+      "baseLocation": "Maranello",
+      "powerUnit": "Ferrari"
+    }
+  ]
+  ```
 
-### 📡 Semana 3 – Telemetria (Node.js + NestJS/Express + MySQL)
-- Microserviço em Node.js com WebSockets (Socket.io/WS) para ingestão de telemetria de alta frequência (Velocidade, RPM, Marcha, Desgaste de Pneus, Temperatura de Freios, ERS).
-- Simulador de telemetria com streaming contínuo das voltas dos pilotos em circuito.
+#### `GET /api/v1/teams/{id}` — Obter Escuderia por ID
+- **Permissão:** Pública
 
-### 🤖 Semana 4 – Predictive AI Engine (Python + FastAPI)
-- API de Machine Learning em Python (FastAPI) para predição de desgaste de pneus e momento ideal de Pit Stop (*Pit Window*).
-- Algoritmos para estimativa de perda de tempo no pit lane e probabilidade de Safety Car.
-
-### 🐳 Semana 5 – Infraestrutura & DevOps (Docker + CI/CD + AWS)
-- Multi-stage Dockerfiles para otimização dos containers de todos os microserviços.
-- Orquestração completa no `docker-compose.yml` (PostgreSQL, MySQL, Redis e serviços).
-- Pipelines de CI/CD via GitHub Actions com testes automatizados, build e deploy na AWS.
+#### `POST /api/v1/teams` — Cadastrar Nova Escuderia
+- **Permissão:** Requer Token JWT Bearer (`ROLE_ADMIN`)
+- **Header:** `Authorization: Bearer <TOKEN>`
+- **Payload Request:**
+  ```json
+  {
+    "name": "Red Bull Racing",
+    "country": "Austria",
+    "baseLocation": "Milton Keynes",
+    "powerUnit": "Honda RBPT"
+  }
+  ```
 
 ---
 
-## 🏗️ Estrutura do Monorepo
+### 👤 3. Pilotos / Drivers (`/api/v1/drivers`)
 
-```text
-PitStopEngineManager/
-├── services/
-│   ├── core-championship/   # [Semana 1] Java 21 + Spring Boot 3 + PostgreSQL (Concluído)
-│   ├── telemetry/           # [Semana 3] Node.js + WebSockets + MySQL (Pendente)
-│   └── predictive-ai/       # [Semana 4] Python + FastAPI + Machine Learning (Pendente)
-├── frontend/                # [Semana 2] Next.js + React + TypeScript (Em Breve)
-├── infra/                   # [Semana 5] Docker Compose, CI/CD GitHub Actions & AWS
-└── docker-compose.yml       # Orquestração local dos containers e bancos de dados
-```
+#### `GET /api/v1/drivers` — Listar Todos os Pilotos
+- **Permissão:** Pública
+
+#### `POST /api/v1/drivers` — Cadastrar Novo Piloto
+- **Permissão:** Requer Token JWT Bearer (`ROLE_ADMIN`)
+- **Header:** `Authorization: Bearer <TOKEN>`
+- **Payload Request:**
+  ```json
+  {
+    "code": "LEC",
+    "permanentNumber": 16,
+    "firstName": "Charles",
+    "lastName": "Leclerc",
+    "nationality": "Monaco",
+    "teamId": 1
+  }
+  ```
+
+---
+
+### 🏁 4. Circuitos / Circuits (`/api/v1/circuits`)
+
+#### `GET /api/v1/circuits` — Listar Todos os Circuitos
+- **Permissão:** Pública
+
+#### `POST /api/v1/circuits` — Cadastrar Novo Circuito
+- **Permissão:** Requer Token JWT Bearer (`ROLE_ADMIN`)
+- **Payload Request:**
+  ```json
+  {
+    "name": "Autódromo José Carlos Pace",
+    "location": "São Paulo",
+    "country": "Brazil",
+    "lengthKm": 4.309,
+    "laps": 71
+  }
+  ```
+
+---
+
+### 🏆 5. Grandes Prêmios & Resultados (`/api/v1/races`)
+
+#### `GET /api/v1/races?season=2026` — Listar Corridas da Temporada
+- **Permissão:** Pública
+
+#### `POST /api/v1/races` — Agendar Novo GP
+- **Permissão:** Requer Token JWT Bearer (`ROLE_ADMIN`)
+- **Payload Request:**
+  ```json
+  {
+    "season": 2026,
+    "round": 1,
+    "name": "GP de São Paulo",
+    "date": "2026-11-08",
+    "circuitId": 1
+  }
+  ```
+
+#### `POST /api/v1/races/{raceId}/results` — Registrar Resultados da Corrida & Disparar Eventos RabbitMQ
+- **Permissão:** Requer Token JWT Bearer (`ROLE_ADMIN`)
+- **Efeitos Colaterais:**
+  - Calcula a pontuação oficial da FIA F1 (25-18-15... + 1 ponto de volta rápida para Top 10).
+  - Publica o evento `RaceFinishedEvent` na fila `f1.race.results.queue`.
+  - Publica eventos `LapRegisteredEvent` na fila `f1.telemetry.laps.queue`.
+- **Payload Request:**
+  ```json
+  [
+    {
+      "driverId": 1,
+      "position": 1,
+      "gridPosition": 1,
+      "fastestLap": true,
+      "fastestLapTime": "1:10.540",
+      "status": "FINISHED"
+    },
+    {
+      "driverId": 2,
+      "position": 2,
+      "gridPosition": 2,
+      "fastestLap": false,
+      "status": "FINISHED"
+    }
+  ]
+  ```
+
+---
+
+### 📊 6. Tabelas de Classificação / Standings (`/api/v1/standings`)
+
+#### `GET /api/v1/standings/drivers?season=2026` — Classificação Oficial de Pilotos
+- **Permissão:** Pública
+- **Response (200 OK):**
+  ```json
+  [
+    {
+      "rank": 1,
+      "driverId": 1,
+      "driverCode": "LEC",
+      "driverName": "Charles Leclerc",
+      "permanentNumber": 16,
+      "teamName": "Scuderia Ferrari",
+      "totalPoints": 26.0,
+      "wins": 1,
+      "podiums": 1
+    }
+  ]
+  ```
+
+#### `GET /api/v1/standings/teams?season=2026` — Classificação Oficial de Construtores
+- **Permissão:** Pública
+- **Response (200 OK):**
+  ```json
+  [
+    {
+      "rank": 1,
+      "teamId": 1,
+      "teamName": "Scuderia Ferrari",
+      "country": "Italy",
+      "totalPoints": 26.0,
+      "wins": 1,
+      "podiums": 1
+    }
+  ]
+  ```
+
+---
+
+## 🐇 Arquitetura de Eventos em Tempo Real (RabbitMQ)
+
+- **Painel de Gerenciamento Web:** `http://localhost:15672` (Credenciais: `guest`/`guest`)
+- **Topic Exchange:** `f1.events`
+
+| Evento | Fila (Queue) | Routing Key | Payload de Exemplo |
+| :--- | :--- | :--- | :--- |
+| **`RaceFinishedEvent`** | `f1.race.results.queue` | `f1.race.finished` | `{ "raceId": 1, "raceName": "GP de SP", "winnerDriverCode": "LEC", "winnerTeamName": "Ferrari" }` |
+| **`LapRegisteredEvent`** | `f1.telemetry.laps.queue` | `f1.lap.registered` | `{ "raceId": 1, "driverCode": "LEC", "fastestLap": true, "fastestLapTime": "1:10.540" }` |
 
 ---
 
@@ -96,25 +262,29 @@ git clone https://github.com/BatistaSec/PitStopEngineManager.git
 cd PitStopEngineManager
 ```
 
-### 2. Iniciar o Banco de Dados PostgreSQL via Docker
+### 2. Iniciar PostgreSQL & RabbitMQ via Docker
 ```bash
-docker-compose up -d postgres
+docker-compose up -d
 ```
 
-### 3. Rodar os Testes Unitários do Core Championship
+### 3. Rodar a Suíte Completa de Testes
 ```bash
 cd services/core-championship
 mvn clean test
 ```
 
-### 4. Executar o Microserviço Spring Boot
+### 4. Executar a Aplicação Spring Boot
 ```bash
+# Execução Padrão (PostgreSQL)
 mvn spring-boot:run
+
+# Execução Dev Fallback (H2 em memória)
+mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```
 
-### 5. Acessar os Endpoints da API
+### 5. Acessar a Documentação Interativa
 - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- **OpenAPI JSON:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+- **Painel RabbitMQ:** [http://localhost:15672](http://localhost:15672)
 
 ---
 
