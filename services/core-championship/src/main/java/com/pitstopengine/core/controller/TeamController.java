@@ -37,4 +37,17 @@ public class TeamController {
     public ResponseEntity<TeamDTO> getTeamById(@PathVariable Long id) {
         return ResponseEntity.ok(championshipService.getTeamById(id));
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar dados de uma escuderia")
+    public ResponseEntity<TeamDTO> updateTeam(@PathVariable Long id, @Valid @RequestBody TeamDTO dto) {
+        return ResponseEntity.ok(championshipService.updateTeam(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Remover uma escuderia")
+    public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
+        championshipService.deleteTeam(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                         // Criação e Modificação (POST, PUT, DELETE) exigem autenticação
                         .requestMatchers(HttpMethod.POST, "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 // Permitir frames do H2 Console

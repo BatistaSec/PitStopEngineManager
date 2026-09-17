@@ -50,6 +50,25 @@ public class ChampionshipService {
         return mapToTeamDTO(team);
     }
 
+    @Transactional
+    public TeamDTO updateTeam(Long id, TeamDTO dto) {
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Team not found with ID: " + id));
+        team.setName(dto.getName());
+        team.setCountry(dto.getCountry());
+        team.setBaseLocation(dto.getBaseLocation());
+        team.setPowerUnit(dto.getPowerUnit());
+        return mapToTeamDTO(teamRepository.save(team));
+    }
+
+    @Transactional
+    public void deleteTeam(Long id) {
+        if (!teamRepository.existsById(id)) {
+            throw new RuntimeException("Team not found with ID: " + id);
+        }
+        teamRepository.deleteById(id);
+    }
+
     // --- DRIVERS ---
     @Transactional
     public DriverDTO createDriver(DriverDTO dto) {
@@ -79,6 +98,29 @@ public class ChampionshipService {
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Driver not found with ID: " + id));
         return mapToDriverDTO(driver);
+    }
+
+    @Transactional
+    public DriverDTO updateDriver(Long id, DriverDTO dto) {
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Driver not found with ID: " + id));
+        Team team = teamRepository.findById(dto.getTeamId())
+                .orElseThrow(() -> new RuntimeException("Team not found with ID: " + dto.getTeamId()));
+        driver.setCode(dto.getCode().toUpperCase());
+        driver.setPermanentNumber(dto.getPermanentNumber());
+        driver.setFirstName(dto.getFirstName());
+        driver.setLastName(dto.getLastName());
+        driver.setNationality(dto.getNationality());
+        driver.setTeam(team);
+        return mapToDriverDTO(driverRepository.save(driver));
+    }
+
+    @Transactional
+    public void deleteDriver(Long id) {
+        if (!driverRepository.existsById(id)) {
+            throw new RuntimeException("Driver not found with ID: " + id);
+        }
+        driverRepository.deleteById(id);
     }
 
     // --- CIRCUITS ---

@@ -44,5 +44,30 @@ export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): 
     throw new Error(errorText || `HTTP Error ${response.status}`);
   }
 
+  // Handle 204 No Content (e.g. DELETE responses)
+  if (response.status === 204) {
+    return undefined as unknown as T;
+  }
+
   return response.json();
 }
+
+// ---- Teams CRUD ----
+export const createTeam = (data: Record<string, unknown>) =>
+  apiFetch('/teams', { method: 'POST', body: JSON.stringify(data) });
+
+export const updateTeam = (id: number, data: Record<string, unknown>) =>
+  apiFetch(`/teams/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+
+export const deleteTeam = (id: number) =>
+  apiFetch(`/teams/${id}`, { method: 'DELETE' });
+
+// ---- Drivers CRUD ----
+export const createDriver = (data: Record<string, unknown>) =>
+  apiFetch('/drivers', { method: 'POST', body: JSON.stringify(data) });
+
+export const updateDriver = (id: number, data: Record<string, unknown>) =>
+  apiFetch(`/drivers/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+
+export const deleteDriver = (id: number) =>
+  apiFetch(`/drivers/${id}`, { method: 'DELETE' });

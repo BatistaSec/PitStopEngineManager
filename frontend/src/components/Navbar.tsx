@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flag, Activity, Trophy, Calendar, Lock, User, LogOut } from 'lucide-react';
+import { Flag, Activity, Trophy, Calendar, Lock, User, LogOut, Clock, TrendingUp, Users, Wrench } from 'lucide-react';
 import { getAuthToken, logout } from '../lib/api';
 
 interface NavbarProps {
@@ -9,6 +9,15 @@ interface NavbarProps {
   setActiveTab: (tab: string) => void;
   onOpenAuth: () => void;
 }
+
+const TABS = [
+  { id: 'livetiming', label: 'Live Timing', icon: Clock },
+  { id: 'lapevolution', label: 'Lap Chart', icon: TrendingUp },
+  { id: 'pitwall', label: 'Telemetria', icon: Activity },
+  { id: 'management', label: 'Gestão', icon: Wrench },
+  { id: 'standings', label: 'Classificação', icon: Trophy },
+  { id: 'races', label: 'Corridas', icon: Calendar },
+];
 
 export default function Navbar({ activeTab, setActiveTab, onOpenAuth }: NavbarProps) {
   const token = getAuthToken();
@@ -25,7 +34,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAuth }: NavbarPr
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* Logo & Status Indicator */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('pitwall')}>
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('livetiming')}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#e10600] to-red-500 flex items-center justify-center shadow-lg shadow-red-600/30">
               <Flag className="w-5 h-5 text-white" />
             </div>
@@ -44,42 +53,21 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAuth }: NavbarPr
         </div>
 
         {/* Tab Navigation */}
-        <nav className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto py-1">
-          <button
-            onClick={() => setActiveTab('pitwall')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === 'pitwall'
-                ? 'bg-[#e10600] text-white shadow-lg shadow-red-600/30'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            <span>Pit Wall</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('standings')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === 'standings'
-                ? 'bg-[#e10600] text-white shadow-lg shadow-red-600/30'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Trophy className="w-4 h-4" />
-            <span>Classificação</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('races')}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === 'races'
-                ? 'bg-[#e10600] text-white shadow-lg shadow-red-600/30'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Corridas</span>
-          </button>
+        <nav className="flex items-center space-x-1 overflow-x-auto py-1 scrollbar-hide">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                activeTab === id
+                  ? 'bg-[#e10600] text-white shadow-lg shadow-red-600/30'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{label}</span>
+            </button>
+          ))}
         </nav>
 
         {/* User Auth Action */}

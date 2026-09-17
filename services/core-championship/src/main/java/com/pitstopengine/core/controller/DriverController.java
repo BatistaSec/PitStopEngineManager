@@ -37,4 +37,17 @@ public class DriverController {
     public ResponseEntity<DriverDTO> getDriverById(@PathVariable Long id) {
         return ResponseEntity.ok(championshipService.getDriverById(id));
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar dados de um piloto")
+    public ResponseEntity<DriverDTO> updateDriver(@PathVariable Long id, @Valid @RequestBody DriverDTO dto) {
+        return ResponseEntity.ok(championshipService.updateDriver(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Remover um piloto")
+    public ResponseEntity<Void> deleteDriver(@PathVariable Long id) {
+        championshipService.deleteDriver(id);
+        return ResponseEntity.noContent().build();
+    }
 }
