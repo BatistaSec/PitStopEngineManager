@@ -1,6 +1,8 @@
 package com.pitstopengine.core.service;
 
 import com.pitstopengine.core.dto.*;
+import com.pitstopengine.core.event.LapRegisteredEvent;
+import com.pitstopengine.core.event.RaceFinishedEvent;
 import com.pitstopengine.core.model.*;
 import com.pitstopengine.core.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class ChampionshipService {
     private final RaceRepository raceRepository;
     private final RaceResultRepository raceResultRepository;
     private final F1PointsCalculator pointsCalculator;
+    private final RabbitMQEventPublisher eventPublisher;
 
     // --- TEAMS ---
     @Transactional
@@ -124,7 +127,7 @@ public class ChampionshipService {
                 .collect(Collectors.toList());
     }
 
-    // --- RACE RESULTS ---
+    // --- RACE RESULTS & RABBITMQ EVENTS ---
     @Transactional
     public List<RaceResultResponseDTO> submitRaceResults(Long raceId, List<RaceResultRequestDTO> results) {
         Race race = raceRepository.findById(raceId)
@@ -154,10 +157,38 @@ public class ChampionshipService {
                     .build();
 
             savedResults.add(raceResultRepository.save(result));
+
+            // Publicar evento de volta registrada se for volta mais rápida ou com tempo definido
+            if (Boolean.TRUE.equals(req.getFastestLap()) || req.getFastestLapTime() != null) {
+                eventPublisher.publishLapRegisteredEvent(LapRegisteredEvent.builder()
+                        .raceId(race.getId())
+                        .driverId(driver.getId())
+                        .driverCode(driver.getCode())
+                        .position(req.getPosition())
+                        .fastestLap(Boolean.TRUE.equals(req.getFastestLap()))
+                        .fastestLapTime(req.getFastestLapTime())
+                        .build());
+            }
         }
 
         race.setCompleted(true);
         raceRepository.save(race);
+
+        // Publicar evento de corrida finalizada no RabbitMQ
+        Optional<RaceResult> winner = savedResults.stream()
+                .filter(r -> r.getPosition() == 1)
+                .findFirst();
+
+        eventPublisher.publishRaceFinishedEvent(RaceFinishedEvent.builder()
+                .raceId(race.getId())
+                .raceName(race.getName())
+                .season(race.getSeason())
+                .round(race.getRound())
+                .winnerDriverCode(winner.map(w -> w.getDriver().getCode()).orElse("N/A"))
+                .winnerDriverName(winner.map(w -> w.getDriver().getFirstName() + " " + w.getDriver().getLastName()).orElse("N/A"))
+                .winnerTeamName(winner.map(w -> w.getDriver().getTeam() != null ? w.getDriver().getTeam().getName() : "N/A").orElse("N/A"))
+                .totalParticipants(savedResults.size())
+                .build());
 
         return savedResults.stream().map(this::mapToRaceResultResponseDTO).collect(Collectors.toList());
     }
@@ -197,7 +228,6 @@ public class ChampionshipService {
                     .build());
         }
 
-        // Sort by totalPoints desc, wins desc
         standings.sort(Comparator.comparing(DriverStandingDTO::getTotalPoints)
                 .thenComparing(DriverStandingDTO::getWins).reversed());
 
