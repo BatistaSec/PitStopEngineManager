@@ -1,3 +1,11 @@
+# IDEs and Agent configurations
+.agents/
+.claude/
+.cursor/
+.devin/
+.vscode/
+.idea/
+
 # dependencies
 node_modules/
 **/node_modules/
@@ -38,10 +46,8 @@ yarn-debug.log*
 .env.production
 .env.development
 
-# vercel & IDE
+# vercel
 .vercel
-.vscode/
-.idea/
 
 # typescript
 *.tsbuildinfo
