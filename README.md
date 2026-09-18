@@ -54,10 +54,18 @@ O **Pit Wall Monitor** é o painel frontal interativo do sistema desenvolvido co
 ### 🏎️ 2. Escuderias (`/api/v1/teams`)
 - `GET /api/v1/teams`: Listar escuderias (Público).
 - `POST /api/v1/teams`: Cadastrar escuderia (Requer Bearer Token JWT `ROLE_ADMIN`).
+- `PUT /api/v1/teams/{id}`: Atualizar escuderia (Requer Bearer Token JWT `ROLE_ADMIN`).
+- `DELETE /api/v1/teams/{id}`: Remover escuderia (Requer Bearer Token JWT `ROLE_ADMIN`).
 
 ### 👤 3. Pilotos (`/api/v1/drivers`)
 - `GET /api/v1/drivers`: Listar pilotos (Público).
 - `POST /api/v1/drivers`: Cadastrar piloto (Requer Bearer Token JWT `ROLE_ADMIN`).
+- `PUT /api/v1/drivers/{id}`: Atualizar piloto (Requer Bearer Token JWT `ROLE_ADMIN`).
+- `DELETE /api/v1/drivers/{id}`: Remover piloto (Requer Bearer Token JWT `ROLE_ADMIN`).
+
+### 📡 3.5. Telemetria e Live Timing (SSE)
+- `GET /api/v1/livetiming/stream`: Stream SSE em tempo real de posições, gaps e setores (Público).
+- `GET /api/v1/telemetry/stream`: Stream SSE de telemetria de alta frequência (Público).
 
 ### 🏁 4. Circuitos (`/api/v1/circuits`)
 - `GET /api/v1/circuits`: Listar circuitos.

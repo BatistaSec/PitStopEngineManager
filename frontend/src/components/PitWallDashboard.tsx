@@ -25,7 +25,7 @@ export default function PitWallDashboard() {
       {/* Navbar Header */}
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab: string) => setActiveTab(tab as DashboardTab)}
         onOpenAuth={() => setIsAuthOpen(true)}
       />
 

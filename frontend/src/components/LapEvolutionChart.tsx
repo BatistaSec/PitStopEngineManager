@@ -204,11 +204,12 @@ export default function LapEvolutionChart() {
               }}
               labelStyle={{ color: '#9ca3af', fontWeight: 'bold' }}
               labelFormatter={(label) => `Volta ${label}`}
-              formatter={(value: number, name: string) => {
-                const mins = Math.floor(value / 60);
-                const secs = (value % 60).toFixed(3);
-                const formatted = mins > 0 ? `${mins}:${secs.padStart(6, '0')}` : `${value.toFixed(3)}s`;
-                return [formatted, name];
+              formatter={(value: any, name: any) => {
+                const num = Number(value);
+                const mins = Math.floor(num / 60);
+                const secs = (num % 60).toFixed(3);
+                const formatted = mins > 0 ? `${mins}:${secs.padStart(6, '0')}` : `${num.toFixed(3)}s`;
+                return [formatted, String(name)];
               }}
             />
             <Legend
