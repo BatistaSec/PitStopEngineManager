@@ -91,7 +91,7 @@ export default function PitWallTelemetry() {
     <div className="space-y-6">
       {/* Driver Selector & Stream Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#141722] p-4 rounded-2xl border border-white/10">
-        <div className="flex items-center space-x-3 overflow-x-auto pb-2 md:pb-0">
+        <div className="flex items-center space-x-3 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
           <span className="text-xs text-gray-400 font-mono uppercase tracking-wider">Piloto em Pista:</span>
           {DRIVERS.map((driver) => (
             <button

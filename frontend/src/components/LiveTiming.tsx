@@ -128,7 +128,7 @@ export default function LiveTiming() {
 
       {/* Timing Table */}
       <div className="bg-[#141722] rounded-2xl border border-white/10 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-hide">
           <table className="w-full text-xs font-mono">
             <thead>
               <tr className="bg-[#1a1d2e] text-gray-400 uppercase tracking-wider">
