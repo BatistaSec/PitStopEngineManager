@@ -57,17 +57,17 @@ const TRACK_STATUS_STYLES: Record<string, { bg: string; text: string; icon: Reac
 };
 
 const TEAM_COLORS: Record<string, string> = {
-  'Red Bull Racing': 'border-l-blue-600',
-  'McLaren': 'border-l-orange-500',
-  'Ferrari': 'border-l-red-600',
-  'Mercedes': 'border-l-teal-400',
-  'Aston Martin': 'border-l-green-600',
-  'Williams': 'border-l-blue-400',
-  'Alpine': 'border-l-pink-500',
-  'Sauber': 'border-l-green-400',
-  'RB': 'border-l-indigo-400',
-  'Haas': 'border-l-gray-400',
-  'Stake F1': 'border-l-green-500',
+  'Red Bull Racing': 'border-l-[#3671C6]',
+  'McLaren F1 Team': 'border-l-[#FF8000]',
+  'Scuderia Ferrari': 'border-l-[#E8002D]',
+  'Mercedes AMG': 'border-l-[#27F4D2]',
+  'Aston Martin': 'border-l-[#229971]',
+  'Williams': 'border-l-[#64C4FF]',
+  'Alpine': 'border-l-[#FF87BC]',
+  'Audi': 'border-l-[#F50537]',
+  'RB F1 Team': 'border-l-[#6692FF]',
+  'Haas': 'border-l-[#B6BABD]',
+  'Cadillac': 'border-l-[#FFD700]',
 };
 
 export default function LiveTiming() {

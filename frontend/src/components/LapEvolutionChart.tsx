@@ -15,14 +15,14 @@ import { TrendingUp, Eye, EyeOff } from 'lucide-react';
 
 // Simulated lap time data for the 2026 grid
 const DRIVER_CONFIGS = [
-  { code: 'VER', name: 'Max Verstappen', team: 'Red Bull Racing', color: '#3b82f6', basePace: 81.2 },
-  { code: 'NOR', name: 'Lando Norris', team: 'McLaren', color: '#f97316', basePace: 81.4 },
-  { code: 'LEC', name: 'Charles Leclerc', team: 'Ferrari', color: '#dc2626', basePace: 81.5 },
-  { code: 'HAM', name: 'Lewis Hamilton', team: 'Ferrari', color: '#f59e0b', basePace: 81.7 },
-  { code: 'RUS', name: 'George Russell', team: 'Mercedes', color: '#2dd4bf', basePace: 81.8 },
-  { code: 'PIA', name: 'Oscar Piastri', team: 'McLaren', color: '#fb923c', basePace: 81.6 },
-  { code: 'ALO', name: 'Fernando Alonso', team: 'Aston Martin', color: '#22c55e', basePace: 82.1 },
-  { code: 'SAI', name: 'Carlos Sainz', team: 'Williams', color: '#60a5fa', basePace: 82.0 },
+  { code: 'ANT', name: 'Andrea Kimi Antonelli', team: 'Mercedes AMG', color: '#27F4D2', basePace: 81.1 },
+  { code: 'RUS', name: 'George Russell', team: 'Mercedes AMG', color: '#00D2BE', basePace: 81.3 },
+  { code: 'HAM', name: 'Lewis Hamilton', team: 'Scuderia Ferrari', color: '#E8002D', basePace: 81.5 },
+  { code: 'NOR', name: 'Lando Norris', team: 'McLaren F1 Team', color: '#FF8000', basePace: 81.4 },
+  { code: 'LEC', name: 'Charles Leclerc', team: 'Scuderia Ferrari', color: '#B30022', basePace: 81.6 },
+  { code: 'VER', name: 'Max Verstappen', team: 'Red Bull Racing', color: '#3671C6', basePace: 81.2 },
+  { code: 'PIA', name: 'Oscar Piastri', team: 'McLaren F1 Team', color: '#FF9933', basePace: 81.6 },
+  { code: 'HAD', name: 'Isack Hadjar', team: 'Red Bull Racing', color: '#1E417A', basePace: 82.0 },
 ];
 
 function generateLapData(totalLaps: number) {
@@ -78,7 +78,7 @@ function generateLapData(totalLaps: number) {
 
 export default function LapEvolutionChart() {
   const [activeDrivers, setActiveDrivers] = useState<Set<string>>(
-    new Set(['VER', 'NOR', 'LEC', 'HAM'])
+    new Set(['ANT', 'RUS', 'HAM', 'NOR'])
   );
   const [totalLaps] = useState(50);
 
