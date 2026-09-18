@@ -26,44 +26,7 @@ interface TeamStanding {
   podiums: number;
 }
 
-const MOCK_DRIVERS: DriverStanding[] = [
-  { rank: 1, driverId: 1, driverCode: 'ANT', driverName: 'Andrea Kimi Antonelli', permanentNumber: 12, teamName: 'Mercedes AMG', totalPoints: 292, wins: 8, podiums: 11 },
-  { rank: 2, driverId: 2, driverCode: 'RUS', driverName: 'George Russell', permanentNumber: 63, teamName: 'Mercedes AMG', totalPoints: 211, wins: 2, podiums: 8 },
-  { rank: 3, driverId: 3, driverCode: 'HAM', driverName: 'Lewis Hamilton', permanentNumber: 44, teamName: 'Scuderia Ferrari', totalPoints: 191, wins: 1, podiums: 6 },
-  { rank: 4, driverId: 4, driverCode: 'NOR', driverName: 'Lando Norris', permanentNumber: 4, teamName: 'McLaren F1 Team', totalPoints: 186, wins: 2, podiums: 5 },
-  { rank: 5, driverId: 5, driverCode: 'LEC', driverName: 'Charles Leclerc', permanentNumber: 16, teamName: 'Scuderia Ferrari', totalPoints: 167, wins: 1, podiums: 5 },
-  { rank: 6, driverId: 6, driverCode: 'VER', driverName: 'Max Verstappen', permanentNumber: 1, teamName: 'Red Bull Racing', totalPoints: 145, wins: 0, podiums: 4 },
-  { rank: 7, driverId: 7, driverCode: 'PIA', driverName: 'Oscar Piastri', permanentNumber: 81, teamName: 'McLaren F1 Team', totalPoints: 120, wins: 0, podiums: 2 },
-  { rank: 8, driverId: 8, driverCode: 'HAD', driverName: 'Isack Hadjar', permanentNumber: 17, teamName: 'Red Bull Racing', totalPoints: 85, wins: 0, podiums: 1 },
-  { rank: 9, driverId: 9, driverCode: 'LAW', driverName: 'Liam Lawson', permanentNumber: 30, teamName: 'RB F1 Team', totalPoints: 59, wins: 0, podiums: 0 },
-  { rank: 10, driverId: 10, driverCode: 'GAS', driverName: 'Pierre Gasly', permanentNumber: 10, teamName: 'Alpine', totalPoints: 41, wins: 0, podiums: 0 },
-  { rank: 11, driverId: 11, driverCode: 'DOO', driverName: 'Jack Doohan', permanentNumber: 7, teamName: 'Alpine', totalPoints: 27, wins: 0, podiums: 0 },
-  { rank: 12, driverId: 12, driverCode: 'TSU', driverName: 'Yuki Tsunoda', permanentNumber: 22, teamName: 'RB F1 Team', totalPoints: 18, wins: 0, podiums: 0 },
-  { rank: 13, driverId: 13, driverCode: 'HUL', driverName: 'Nico Hülkenberg', permanentNumber: 27, teamName: 'Audi', totalPoints: 15, wins: 0, podiums: 0 },
-  { rank: 14, driverId: 14, driverCode: 'OCO', driverName: 'Esteban Ocon', permanentNumber: 31, teamName: 'Haas', totalPoints: 12, wins: 0, podiums: 0 },
-  { rank: 15, driverId: 15, driverCode: 'BEA', driverName: 'Oliver Bearman', permanentNumber: 87, teamName: 'Haas', totalPoints: 9, wins: 0, podiums: 0 },
-  { rank: 16, driverId: 16, driverCode: 'ALB', driverName: 'Alexander Albon', permanentNumber: 23, teamName: 'Williams', totalPoints: 8, wins: 0, podiums: 0 },
-  { rank: 17, driverId: 17, driverCode: 'SAI', driverName: 'Carlos Sainz', permanentNumber: 55, teamName: 'Williams', totalPoints: 3, wins: 0, podiums: 0 },
-  { rank: 18, driverId: 18, driverCode: 'ALO', driverName: 'Fernando Alonso', permanentNumber: 14, teamName: 'Aston Martin', totalPoints: 3, wins: 0, podiums: 0 },
-  { rank: 19, driverId: 19, driverCode: 'BOR', driverName: 'Gabriel Bortoleto', permanentNumber: 5, teamName: 'Audi', totalPoints: 2, wins: 0, podiums: 0 },
-  { rank: 20, driverId: 20, driverCode: 'STR', driverName: 'Lance Stroll', permanentNumber: 18, teamName: 'Aston Martin', totalPoints: 0, wins: 0, podiums: 0 },
-  { rank: 21, driverId: 21, driverCode: 'HER', driverName: 'Colton Herta', permanentNumber: 26, teamName: 'Cadillac', totalPoints: 0, wins: 0, podiums: 0 },
-  { rank: 22, driverId: 22, driverCode: 'OWA', driverName: 'Pato O\'Ward', permanentNumber: 28, teamName: 'Cadillac', totalPoints: 0, wins: 0, podiums: 0 },
-];
 
-const MOCK_TEAMS: TeamStanding[] = [
-  { rank: 1, teamId: 1, teamName: 'Mercedes AMG', country: 'Germany', totalPoints: 503, wins: 10, podiums: 19 },
-  { rank: 2, teamId: 2, teamName: 'Scuderia Ferrari', country: 'Italy', totalPoints: 358, wins: 2, podiums: 11 },
-  { rank: 3, teamId: 3, teamName: 'McLaren F1 Team', country: 'United Kingdom', totalPoints: 306, wins: 2, podiums: 7 },
-  { rank: 4, teamId: 4, teamName: 'Red Bull Racing', country: 'Austria', totalPoints: 230, wins: 0, podiums: 5 },
-  { rank: 5, teamId: 5, teamName: 'RB F1 Team', country: 'Italy', totalPoints: 77, wins: 0, podiums: 0 },
-  { rank: 6, teamId: 6, teamName: 'Alpine', country: 'France', totalPoints: 68, wins: 0, podiums: 0 },
-  { rank: 7, teamId: 7, teamName: 'Haas', country: 'United States', totalPoints: 21, wins: 0, podiums: 0 },
-  { rank: 8, teamId: 8, teamName: 'Audi', country: 'Germany', totalPoints: 17, wins: 0, podiums: 0 },
-  { rank: 9, teamId: 9, teamName: 'Williams', country: 'United Kingdom', totalPoints: 11, wins: 0, podiums: 0 },
-  { rank: 10, teamId: 10, teamName: 'Aston Martin', country: 'United Kingdom', totalPoints: 3, wins: 0, podiums: 0 },
-  { rank: 11, teamId: 11, teamName: 'Cadillac', country: 'United States', totalPoints: 0, wins: 0, podiums: 0 },
-];
 
 const TEAM_COLORS: Record<string, string> = {
   'Red Bull Racing': 'border-l-[#3671C6]',
@@ -81,8 +44,8 @@ const TEAM_COLORS: Record<string, string> = {
 
 export default function StandingsTable() {
   const [view, setView] = useState<'drivers' | 'teams'>('drivers');
-  const [drivers, setDrivers] = useState<DriverStanding[]>(MOCK_DRIVERS);
-  const [teams, setTeams] = useState<TeamStanding[]>(MOCK_TEAMS);
+  const [drivers, setDrivers] = useState<DriverStanding[]>([]);
+  const [teams, setTeams] = useState<TeamStanding[]>([]);
   const [loading, setLoading] = useState(false);
   const [isLiveApi, setIsLiveApi] = useState(false);
 

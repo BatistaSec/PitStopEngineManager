@@ -14,34 +14,10 @@ interface Race {
   completed: boolean;
 }
 
-const MOCK_RACES: Race[] = [
-  { id: 1, season: 2026, round: 1, name: 'Australian GP', date: '2026-03-08', circuitName: 'Albert Park', completed: true },
-  { id: 2, season: 2026, round: 2, name: 'Chinese GP', date: '2026-03-15', circuitName: 'Shanghai', completed: true },
-  { id: 3, season: 2026, round: 3, name: 'Japanese GP', date: '2026-03-29', circuitName: 'Suzuka', completed: true },
-  { id: 4, season: 2026, round: 4, name: 'Miami GP', date: '2026-05-03', circuitName: 'Miami', completed: true },
-  { id: 5, season: 2026, round: 5, name: 'Canadian GP', date: '2026-05-24', circuitName: 'Montreal', completed: true },
-  { id: 6, season: 2026, round: 6, name: 'Monaco GP', date: '2026-06-07', circuitName: 'Monte Carlo', completed: true },
-  { id: 7, season: 2026, round: 7, name: 'Spanish GP', date: '2026-06-14', circuitName: 'Barcelona', completed: true },
-  { id: 8, season: 2026, round: 8, name: 'Austrian GP', date: '2026-06-28', circuitName: 'Red Bull Ring', completed: true },
-  { id: 9, season: 2026, round: 9, name: 'British GP', date: '2026-07-05', circuitName: 'Silverstone', completed: true },
-  { id: 10, season: 2026, round: 10, name: 'Belgian GP', date: '2026-07-19', circuitName: 'Spa-Francorchamps', completed: true },
-  { id: 11, season: 2026, round: 11, name: 'Hungarian GP', date: '2026-07-26', circuitName: 'Hungaroring', completed: true },
-  { id: 12, season: 2026, round: 12, name: 'Dutch GP', date: '2026-08-23', circuitName: 'Zandvoort', completed: true },
-  { id: 13, season: 2026, round: 13, name: 'Italian GP', date: '2026-09-06', circuitName: 'Monza', completed: true },
-  { id: 14, season: 2026, round: 14, name: 'Spanish GP (Madrid)', date: '2026-09-13', circuitName: 'Madrid', completed: true },
-  { id: 15, season: 2026, round: 15, name: 'Azerbaijan GP', date: '2026-09-26', circuitName: 'Baku', completed: false },
-  { id: 16, season: 2026, round: 16, name: 'Malaysia GP', date: '2026-10-04', circuitName: 'Sepang', completed: false },
-  { id: 17, season: 2026, round: 17, name: 'Singapore GP', date: '2026-10-11', circuitName: 'Marina Bay', completed: false },
-  { id: 18, season: 2026, round: 18, name: 'United States GP', date: '2026-10-25', circuitName: 'COTA', completed: false },
-  { id: 19, season: 2026, round: 19, name: 'Mexico City GP', date: '2026-11-01', circuitName: 'Hermanos Rodríguez', completed: false },
-  { id: 20, season: 2026, round: 20, name: 'Brazilian GP', date: '2026-11-08', circuitName: 'Interlagos', completed: false },
-  { id: 21, season: 2026, round: 21, name: 'Las Vegas GP', date: '2026-11-22', circuitName: 'Las Vegas Strip', completed: false },
-  { id: 22, season: 2026, round: 22, name: 'Qatar GP', date: '2026-11-29', circuitName: 'Losail', completed: false },
-  { id: 23, season: 2026, round: 23, name: 'Abu Dhabi GP', date: '2026-12-06', circuitName: 'Yas Marina', completed: false },
-];
+
 
 export default function RacesSchedule() {
-  const [races, setRaces] = useState<Race[]>(MOCK_RACES);
+  const [races, setRaces] = useState<Race[]>([]);
 
   useEffect(() => {
     async function loadRaces() {
@@ -51,7 +27,7 @@ export default function RacesSchedule() {
           setRaces(data);
         }
       } catch {
-        // Fallback to MOCK_RACES
+        // Empty catch block
       }
     }
     loadRaces();

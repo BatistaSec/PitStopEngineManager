@@ -11,6 +11,9 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:pitstop}
     password: ${SPRING_DATASOURCE_PASSWORD:pitstop_password}
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
   jpa:
     hibernate:
       ddl-auto: update
