@@ -90,10 +90,12 @@ export default function PitWallTelemetry() {
           total_laps: 57
         })
       });
+      if (!res.ok) throw new Error('Servidor de IA indisponível no momento');
       const data = await res.json();
       setAiPrediction(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert('Aviso da IA: Não foi possível conectar ao motor em http://localhost:8000. Verifique se o backend Python (FastAPI) está rodando.');
     } finally {
       setIsPredicting(false);
     }
@@ -101,6 +103,27 @@ export default function PitWallTelemetry() {
 
   return (
     <div className="space-y-6">
+      {/* Banner de Simulação de Corrida Histórica Real */}
+      <div className="bg-gradient-to-r from-red-950/40 via-purple-900/30 to-blue-950/40 p-4 rounded-2xl border border-red-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-3 h-3 rounded-full bg-red-500 animate-ping"></div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-bold uppercase border border-red-500/30">
+                REPLAY AO VIVO (FASTF1)
+              </span>
+              <h3 className="text-sm font-bold text-white">F1 2023 - GP do Bahrain (Sakhir)</h3>
+            </div>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Hoje não há corrida oficial ao vivo. O sistema está reproduzindo o replay da telemetria real milissegundo a milissegundo.
+            </p>
+          </div>
+        </div>
+        <div className="text-right font-mono text-xs text-gray-300 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5">
+          <span className="text-gray-500">Pista:</span> <span className="text-white font-bold">Bahrain International Circuit</span>
+        </div>
+      </div>
+
       {/* Driver Selector & Stream Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#141722] p-4 rounded-2xl border border-white/10">
         <div className="flex items-center space-x-3 overflow-x-auto scrollbar-hide pb-2 md:pb-0">
