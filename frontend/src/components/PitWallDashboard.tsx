@@ -10,7 +10,7 @@ import RacesSchedule from './RacesSchedule';
 import TeamsDriversManager from './TeamsDriversManager';
 import OverviewDashboard from './OverviewDashboard';
 import PaddockMarket from './PaddockMarket';
-import { Search, Bell, MonitorPlay } from 'lucide-react';
+import { Search, Bell, MonitorPlay, Menu } from 'lucide-react';
 import { getAuthToken } from '../lib/api';
 
 // Lazy-load heavy chart components to improve initial load
@@ -21,6 +21,7 @@ export type DashboardTab = 'overview' | 'livetiming' | 'lapevolution' | 'pitwall
 export default function PitWallDashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const token = getAuthToken();
   const username = typeof window !== 'undefined' ? localStorage.getItem('pitstop_username') : null;
 
@@ -28,20 +29,34 @@ export default function PitWallDashboard() {
     <div className="min-h-screen flex bg-[#0a0a0a] text-gray-300 font-sans selection:bg-gray-800 selection:text-white">
       
       {/* Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col md:ml-64 min-h-screen bg-[#0a0a0a]">
         
         {/* Topbar (Technical Style) */}
-        <header className="h-14 flex items-center justify-between px-6 border-b border-white/5 bg-[#0a0a0a] sticky top-0 z-40">
-          <div className="flex-1 max-w-lg flex items-center space-x-4">
-            <MonitorPlay className="w-4 h-4 text-green-500 animate-pulse" />
+        <header className="h-14 flex items-center justify-between px-4 sm:px-6 border-b border-white/5 bg-[#0a0a0a] sticky top-0 z-40">
+          <div className="flex items-center space-x-3 flex-1 max-w-lg">
+            {/* Mobile Hamburger Button */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-1.5 text-gray-400 hover:text-white bg-[#111] border border-white/10 rounded-sm"
+              title="Abrir Menu"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+
+            <MonitorPlay className="w-4 h-4 text-green-500 animate-pulse hidden sm:block" />
             <div className="relative group w-full">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-white transition-colors" />
               <input 
                 type="text" 
-                placeholder="Query telemetry, drivers or events..." 
+                placeholder="Search..." 
                 className="w-full bg-[#111] border border-white/10 rounded-sm py-1.5 pl-8 pr-3 text-xs font-mono focus:outline-none focus:border-white/30 transition-all text-white placeholder-gray-600"
               />
             </div>
