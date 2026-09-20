@@ -44,6 +44,8 @@ if len(telemetry_data) > 0:
                     "brakeTemp": 400 + (int(row['Brake']) * 50 if not pd.isna(row['Brake']) else 0),
                     "ersLevel": 80.0,
                     "tireWear": 0.0,
+                    "x": float(row['X']) if 'X' in row and not pd.isna(row['X']) else 0.0,
+                    "y": float(row['Y']) if 'Y' in row and not pd.isna(row['Y']) else 0.0,
                     "timestamp": row['Date'].isoformat() if not pd.isna(row['Date']) else ""
                 })
         

@@ -10,6 +10,9 @@ import RacesSchedule from './RacesSchedule';
 import TeamsDriversManager from './TeamsDriversManager';
 import OverviewDashboard from './OverviewDashboard';
 import PaddockMarket from './PaddockMarket';
+import LiveTrackMap from './LiveTrackMap';
+import DriverComparison from './DriverComparison';
+import WeatherSimulator from './WeatherSimulator';
 import { Search, Bell, MonitorPlay, Menu } from 'lucide-react';
 import { getAuthToken } from '../lib/api';
 
@@ -83,10 +86,29 @@ export default function PitWallDashboard() {
 
         {/* Dashboard Content */}
         <main className="flex-1 p-3 sm:p-4 md:p-6 w-full mx-auto space-y-4 sm:space-y-6">
-          {activeTab === 'overview' && <OverviewDashboard />}
+          {/* Weather Simulator Bar on top of active dashboard */}
+          <WeatherSimulator />
+
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <OverviewDashboard />
+              <LiveTrackMap />
+            </div>
+          )}
           {activeTab === 'livetiming' && <LiveTiming />}
-          {activeTab === 'lapevolution' && <OverviewDashboard />}
-          {activeTab === 'pitwall' && <PitWallTelemetry />}
+          {activeTab === 'lapevolution' && (
+            <div className="space-y-6">
+              <DriverComparison />
+              <OverviewDashboard />
+            </div>
+          )}
+          {activeTab === 'pitwall' && (
+            <div className="space-y-6">
+              <LiveTrackMap />
+              <PitWallTelemetry />
+              <DriverComparison />
+            </div>
+          )}
           {activeTab === 'paddock' && <PaddockMarket />}
           {activeTab === 'management' && <TeamsDriversManager />}
           {activeTab === 'standings' && <StandingsTable />}
