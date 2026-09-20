@@ -82,7 +82,7 @@ export default function PitWallDashboard() {
         </header>
 
         {/* Dashboard Content */}
-        <main className="flex-1 p-6 w-full mx-auto space-y-6">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 w-full mx-auto space-y-4 sm:space-y-6">
           {activeTab === 'overview' && <OverviewDashboard />}
           {activeTab === 'livetiming' && <LiveTiming />}
           {activeTab === 'lapevolution' && <OverviewDashboard />}

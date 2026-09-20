@@ -67,44 +67,44 @@ export default function PaddockMarket() {
   });
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in p-2 sm:p-0">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-gray-900 via-[#141722] to-gray-900 p-5 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-gray-900 via-[#141722] to-gray-900 p-4 sm:p-5 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 font-mono text-[10px] font-bold uppercase border border-purple-500/30">
+            <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 font-mono text-[9px] sm:text-[10px] font-bold uppercase border border-purple-500/30">
               FIA PADDOCK & INSIDER MARKET
             </span>
-            <h2 className="text-base font-bold text-white uppercase tracking-wide">Mercado de Pilotos & Contratos F1</h2>
+            <h2 className="text-sm sm:text-base font-bold text-white uppercase tracking-wide">Mercado de Pilotos & Contratos F1</h2>
           </div>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-[11px] sm:text-xs text-gray-400 mt-1">
             Matriz de salários anuais, validade de vínculos contratuais, cláusulas de rescisão e coletivas de imprensa da FIA.
           </p>
         </div>
-        <div className="flex items-center space-x-3 text-xs font-mono text-gray-400 bg-black/40 px-3 py-2 rounded-xl border border-white/5">
-          <DollarSign className="w-4 h-4 text-emerald-400" />
+        <div className="flex items-center space-x-2 text-[11px] sm:text-xs font-mono text-gray-400 bg-black/40 px-3 py-1.5 sm:py-2 rounded-xl border border-white/5 w-full sm:w-auto justify-between sm:justify-start">
+          <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
           <span>Teto Orçamentário Cap: <strong className="text-white">$135M/ano</strong></span>
         </div>
       </div>
 
       {/* Grid: Contracts Table & Market Highlights */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         
-        {/* Main Driver Contract Matrix (2 cols) */}
+        {/* Main Driver Contract Matrix (2 cols on LG, 1 col on Mobile/Tablet) */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between bg-[#111] p-4 rounded-xl border border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-[#111] p-3.5 sm:p-4 rounded-xl border border-white/10 gap-3">
             <div className="flex items-center space-x-2">
               <Award className="w-4 h-4 text-yellow-500" />
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Matriz de Contratos & Salários</h3>
+              <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">Matriz de Contratos & Salários</h3>
             </div>
 
-            {/* Status Filters */}
-            <div className="flex items-center space-x-1.5 overflow-x-auto">
+            {/* Status Filters - Mobile Horizontal Scroll */}
+            <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
               {(['ALL', 'CONFIRMED', 'EXPIRING SOON', 'RUMORED EXIT'] as const).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase font-bold transition-all border ${
+                  className={`px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-mono uppercase font-bold transition-all border whitespace-nowrap ${
                     selectedFilter === filter
                       ? 'bg-white/10 text-white border-white/30'
                       : 'bg-transparent text-gray-500 border-transparent hover:text-white'
