@@ -68,76 +68,121 @@ export default function WeatherSimulator({ onWeatherChange }: WeatherSimulatorPr
     if (onWeatherChange) onWeatherChange(newMode, newTemp);
   };
 
+  const [isReplayActive, setIsReplayActive] = useState<boolean>(true);
+
+  const toggleReplay = () => {
+    const nextState = !isReplayActive;
+    setIsReplayActive(nextState);
+    if (!nextState) {
+      playPitRadio('Replay simulation paused by user control.');
+    } else {
+      playPitRadio('Resuming live replay simulation.');
+    }
+  };
+
   return (
-    <div className="bg-[#111] p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-      {/* Weather Selector */}
-      <div className="flex items-center space-x-3 w-full sm:w-auto">
-        <span className="text-[11px] font-mono text-gray-400 uppercase tracking-wider hidden md:inline">Clima da Pista:</span>
-        <div className="flex bg-[#0a0a0a] border border-white/10 rounded-xl p-1 w-full sm:w-auto justify-between">
-          <button
-            onClick={() => handleModeSelect('DRY')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
-              mode === 'DRY' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Sun className="w-3.5 h-3.5" />
-            <span>DRY</span>
-          </button>
-          <button
-            onClick={() => handleModeSelect('INTERMEDIATE')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
-              mode === 'INTERMEDIATE' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <CloudRain className="w-3.5 h-3.5" />
-            <span>INTER</span>
-          </button>
-          <button
-            onClick={() => handleModeSelect('WET')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
-              mode === 'WET' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <CloudLightning className="w-3.5 h-3.5" />
-            <span>WET</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Temperature & Moisture Metrics */}
-      <div className="flex items-center space-x-4 text-xs font-mono text-gray-400">
-        <div className="flex items-center space-x-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5">
-          <Thermometer className="w-3.5 h-3.5 text-red-400" />
-          <span>TEMP: <strong className="text-white">{trackTemp}°C</strong></span>
-        </div>
-        <div className="flex items-center space-x-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 hidden lg:flex">
-          <Droplets className="w-3.5 h-3.5 text-blue-400" />
-          <span>UMIDADE: <strong className="text-white">{mode === 'DRY' ? '12%' : mode === 'INTERMEDIATE' ? '55%' : '92%'}</strong></span>
-        </div>
-      </div>
-
-      {/* Pit Radio Controls */}
-      <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
-        <div className="flex items-center space-x-2 bg-purple-950/40 border border-purple-500/30 px-3 py-1.5 rounded-xl">
-          <Radio className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-          <span className="text-[10px] font-mono text-purple-200 truncate max-w-[180px] sm:max-w-[220px]">
-            {radioMsg}
-          </span>
+    <div className="space-y-3">
+      {/* Replay Control Banner */}
+      <div className="bg-gradient-to-r from-red-950/40 via-[#161322] to-blue-950/40 p-3 sm:p-4 rounded-2xl border border-red-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-center space-x-3">
+          <div className={`w-3 h-3 rounded-full ${isReplayActive ? 'bg-red-500 animate-ping' : 'bg-gray-600'}`}></div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-400 font-bold uppercase border border-red-500/30">
+                {isReplayActive ? 'REPLAY DA CORRIDA (FASTF1 2023)' : 'REPLAY PAUSADO'}
+              </span>
+              <h3 className="text-xs sm:text-sm font-bold text-white uppercase">Sakhir - GP do Bahrain 2023</h3>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              Não há GP oficial ao vivo hoje. Transmitindo os dados autênticos da corrida anterior.
+            </p>
+          </div>
         </div>
 
+        {/* Action Button to stop / pause replay */}
         <button
-          onClick={() => {
-            const nextState = !isAudioMuted;
-            setIsAudioMuted(nextState);
-            if (!nextState) playPitRadio('Pit radio unmuted, loud and clear!');
-          }}
-          className={`p-2 rounded-xl border transition-all ${
-            isAudioMuted ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+          onClick={toggleReplay}
+          className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all border ${
+            isReplayActive 
+              ? 'bg-red-500/20 text-red-300 border-red-500/30 hover:bg-red-500/30' 
+              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/30'
           }`}
-          title={isAudioMuted ? 'Ativar Rádio do Engenheiro' : 'Mutar Rádio do Engenheiro'}
         >
-          {isAudioMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          <span>{isReplayActive ? '⏸️ PAUSAR SIMULAÇÃO' : '▶️ RETOMAR REPLAY'}</span>
         </button>
+      </div>
+
+      {/* Weather & Pit Radio Control Row */}
+      <div className="bg-[#111] p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Weather Selector */}
+        <div className="flex items-center space-x-3 w-full sm:w-auto">
+          <span className="text-[11px] font-mono text-gray-400 uppercase tracking-wider hidden md:inline">Clima da Pista:</span>
+          <div className="flex bg-[#0a0a0a] border border-white/10 rounded-xl p-1 w-full sm:w-auto justify-between">
+            <button
+              onClick={() => handleModeSelect('DRY')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                mode === 'DRY' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Sun className="w-3.5 h-3.5" />
+              <span>DRY</span>
+            </button>
+            <button
+              onClick={() => handleModeSelect('INTERMEDIATE')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                mode === 'INTERMEDIATE' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <CloudRain className="w-3.5 h-3.5" />
+              <span>INTER</span>
+            </button>
+            <button
+              onClick={() => handleModeSelect('WET')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
+                mode === 'WET' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <CloudLightning className="w-3.5 h-3.5" />
+              <span>WET</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Temperature & Moisture Metrics */}
+        <div className="flex items-center space-x-4 text-xs font-mono text-gray-400">
+          <div className="flex items-center space-x-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5">
+            <Thermometer className="w-3.5 h-3.5 text-red-400" />
+            <span>TEMP: <strong className="text-white">{trackTemp}°C</strong></span>
+          </div>
+          <div className="flex items-center space-x-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/5 hidden lg:flex">
+            <Droplets className="w-3.5 h-3.5 text-blue-400" />
+            <span>UMIDADE: <strong className="text-white">{mode === 'DRY' ? '12%' : mode === 'INTERMEDIATE' ? '55%' : '92%'}</strong></span>
+          </div>
+        </div>
+
+        {/* Pit Radio Controls */}
+        <div className="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
+          <div className="flex items-center space-x-2 bg-purple-950/40 border border-purple-500/30 px-3 py-1.5 rounded-xl">
+            <Radio className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+            <span className="text-[10px] font-mono text-purple-200 truncate max-w-[180px] sm:max-w-[220px]">
+              {radioMsg}
+            </span>
+          </div>
+
+          <button
+            onClick={() => {
+              const nextState = !isAudioMuted;
+              setIsAudioMuted(nextState);
+              if (!nextState) playPitRadio('Pit radio unmuted, loud and clear!');
+            }}
+            className={`p-2 rounded-xl border transition-all ${
+              isAudioMuted ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            }`}
+            title={isAudioMuted ? 'Ativar Rádio do Engenheiro' : 'Mutar Rádio do Engenheiro'}
+          >
+            {isAudioMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
     </div>
   );
