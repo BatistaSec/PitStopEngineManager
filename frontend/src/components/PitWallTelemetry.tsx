@@ -26,12 +26,12 @@ export default function PitWallTelemetry() {
   const [isLive, setIsLive] = useState(true);
   const [telemetryData, setTelemetryData] = useState<TelemetryPoint[]>([]);
   const [currentMetrics, setCurrentMetrics] = useState({
-    speed: 312,
-    rpm: 11800,
-    brakeTemp: 780,
-    ers: 84,
-    gear: 7,
-    tyreWear: 18,
+    speed: 0,
+    rpm: 0,
+    brakeTemp: 0,
+    ers: 0,
+    gear: 0,
+    tyreWear: 0,
   });
 
   const [aiPrediction, setAiPrediction] = useState<{ recommended_pit_lap: number; laps_remaining_until_pit: number } | null>(null);
@@ -182,7 +182,9 @@ export default function PitWallTelemetry() {
         <div className="bg-[#141722] p-4 rounded-2xl border border-white/10 relative overflow-hidden">
           <div className="flex items-center justify-between text-gray-400 mb-2">
             <span className="text-[11px] font-mono uppercase tracking-wider">RPM / Marcha</span>
-            <span className="text-xs font-bold text-red-400 font-mono">M{currentMetrics.gear}</span>
+            <span className="text-xs font-bold text-red-400 font-mono">
+              {currentMetrics.gear > 0 ? `M${currentMetrics.gear}` : 'N'}
+            </span>
           </div>
           <div className="flex items-baseline space-x-1">
             <span className="text-3xl font-extrabold text-white tracking-tight">{currentMetrics.rpm}</span>
