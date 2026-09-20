@@ -23,8 +23,8 @@ O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/Batist
 | :--- | :--- | :--- | :---: |
 | **Semana 1** | **Core Championship & Security** | Java 21, Spring Boot 3, Spring Security 6 (JWT), RabbitMQ, PostgreSQL | `Concluído` ✅ |
 | **Semana 2** | **Frontend Pit Wall** | Next.js 16, React 19, TypeScript, TailwindCSS, Recharts, Lucide | `Concluído` ✅ |
-| **Semana 3** | **Telemetria Streamer** | Node.js, Express / NestJS, WebSockets, MySQL | `Próximo` ⏳ |
-| **Semana 4** | **Predictive AI Engine** | Python, FastAPI, Scikit-Learn, Pandas | `Pendente` 🎯 |
+| **Semana 3** | **Telemetria Streamer** | Node.js, Express, SSE, MySQL, Prisma | `Concluído` ✅ |
+| **Semana 4** | **Predictive AI Engine** | Python, FastAPI, Scikit-Learn, Pandas | `Próximo` ⏳ |
 | **Semana 5** | **Infraestrutura & DevOps** | Docker, Docker Compose, GitHub Actions CI/CD, AWS | `Pendente` 🎯 |
 
 ---
@@ -42,6 +42,19 @@ O **Pit Wall Monitor** é o painel frontal interativo do sistema desenvolvido co
   - Exibição de corridas da temporada 2026 com circuitos e status de conclusão.
 - **🔑 Autenticação & Modal JWT:**
   - Login e registro de usuários com armazenamento seguro do Token JWT Bearer no `localStorage` para criação e modificação de equipes.
+
+---
+
+## 📡 Semana 3: Telemetria Streamer (`services/telemetry-streamer/`)
+
+O **Telemetria Streamer** é o microserviço Node.js responsável por conectar o backend à interface em tempo real via **Server-Sent Events (SSE)**.
+
+- **📊 Server-Sent Events (SSE):**
+  - Integração contínua e leve com o Frontend (`useLiveStream`) sem a complexidade de WebSockets bi-direcionais.
+- **🐇 Consumo de Eventos (RabbitMQ):**
+  - Escuta a exchange `f1.events` e repassa os eventos de `LapRegisteredEvent` e `RaceFinishedEvent` ao frontend.
+- **🗄️ MySQL & Prisma ORM:**
+  - Armazenamento persistente e tipado com TypeScript para registrar histórico de resultados de corridas e telemetria de voltas.
 
 ---
 
@@ -92,18 +105,26 @@ O **Pit Wall Monitor** é o painel frontal interativo do sistema desenvolvido co
 
 ## 🚀 Como Executar o Projeto Localmente
 
-### 1. Iniciar os Serviços Docker (PostgreSQL & RabbitMQ)
+### 1. Iniciar os Serviços Docker (PostgreSQL, MySQL & RabbitMQ)
 ```bash
 docker-compose up -d
 ```
 
-### 2. Executar o Backend (Spring Boot Core Championship)
+### 2. Executar o Backend Core (Spring Boot)
 ```bash
 cd services/core-championship
 mvn spring-boot:run
 ```
 
-### 3. Executar o Frontend (Next.js Pit Wall Dashboard)
+### 3. Executar o Telemetria Streamer (Node.js)
+```bash
+cd services/telemetry-streamer
+npm install
+npx prisma db push
+npx tsx src/index.ts
+```
+
+### 4. Executar o Frontend (Next.js Pit Wall Dashboard)
 ```bash
 cd frontend
 npm install
