@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { DollarSign, Calendar, MessageSquare, Flame, AlertCircle, Award, UserCheck, ShieldCheck, Newspaper, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DollarSign, Calendar, MessageSquare, Flame, AlertCircle, Award, UserCheck, ShieldCheck, Newspaper, ExternalLink, RefreshCw, Radio } from 'lucide-react';
 
 interface DriverContract {
   id: number;
@@ -16,141 +16,52 @@ interface DriverContract {
   notes: string;
 }
 
-interface PressConferenceQuote {
-  id: number;
-  speaker: string;
-  role: string;
-  team: string;
-  date: string;
-  headline: string;
-  quote: string;
-  category: 'PRE-RACE' | 'CONTRACT' | 'TECH' | 'CONTROVERSY';
+interface LiveNewsItem {
+  title: string;
+  description: string;
+  pubDate: string;
+  link: string;
+  source: string;
 }
-
-const CONTRACTS_DATA: DriverContract[] = [
-  {
-    id: 1,
-    driverCode: 'VER',
-    driverName: 'Max Verstappen',
-    team: 'Red Bull Racing',
-    teamColor: '#3671C6',
-    contractUntil: 2028,
-    annualSalary: '$55,000,000',
-    buyoutClause: '$120,000,000',
-    status: 'CONFIRMED',
-    notes: 'Cláusula de saída atrelada ao desempenho do motor Ford em 2026.'
-  },
-  {
-    id: 2,
-    driverCode: 'HAM',
-    driverName: 'Lewis Hamilton',
-    team: 'Scuderia Ferrari',
-    teamColor: '#E8002D',
-    contractUntil: 2026,
-    annualSalary: '$50,000,000',
-    buyoutClause: 'N/A (Ano Final)',
-    status: 'CONFIRMED',
-    notes: 'Contrato multi-anual assinado com opção de extensão para embaixador da marca.'
-  },
-  {
-    id: 3,
-    driverCode: 'LEC',
-    driverName: 'Charles Leclerc',
-    team: 'Scuderia Ferrari',
-    teamColor: '#E8002D',
-    contractUntil: 2029,
-    annualSalary: '$34,000,000',
-    buyoutClause: '$80,000,000',
-    status: 'CONFIRMED',
-    notes: 'Vínculo longo renovado com bônus de vitórias progressivo.'
-  },
-  {
-    id: 4,
-    driverCode: 'NOR',
-    driverName: 'Lando Norris',
-    team: 'McLaren F1 Team',
-    teamColor: '#FF8000',
-    contractUntil: 2027,
-    annualSalary: '$25,000,000',
-    buyoutClause: '$65,000,000',
-    status: 'CONFIRMED',
-    notes: 'Sem cláusula de saída imediata para equipes rivais.'
-  },
-  {
-    id: 5,
-    driverCode: 'RUS',
-    driverName: 'George Russell',
-    team: 'Mercedes AMG',
-    teamColor: '#27F4D2',
-    contractUntil: 2026,
-    annualSalary: '$18,000,000',
-    buyoutClause: 'Em renegociação',
-    status: 'EXPIRING SOON',
-    notes: 'Conversas ativas para renovação estendida até 2028.'
-  },
-  {
-    id: 6,
-    driverCode: 'ANT',
-    driverName: 'Andrea Kimi Antonelli',
-    team: 'Mercedes AMG',
-    teamColor: '#27F4D2',
-    contractUntil: 2026,
-    annualSalary: '$6,000,000',
-    buyoutClause: 'N/A (Rookie Contract)',
-    status: 'NEGOTIATING',
-    notes: 'Mercedes estuda extensão de longo prazo dependendo da pontuação da temporada.'
-  },
-  {
-    id: 7,
-    driverCode: 'PIA',
-    driverName: 'Oscar Piastri',
-    team: 'McLaren F1 Team',
-    teamColor: '#FF8000',
-    contractUntil: 2026,
-    annualSalary: '$12,000,000',
-    buyoutClause: '$45,000,000',
-    status: 'RUMORED EXIT',
-    notes: 'Especulações no paddock apontam forte interesse da Red Bull para ocupar vaga em 2027.'
-  }
-];
-
-const PRESS_QUOTES: PressConferenceQuote[] = [
-  {
-    id: 1,
-    speaker: 'Max Verstappen',
-    role: 'Piloto',
-    team: 'Red Bull Racing',
-    date: '2026-09-18',
-    headline: 'Verstappen comenta sobre nova unidade de potência 2026 e seu futuro',
-    quote: '"O nosso foco principal está na entrega de energia nas retas. O contrato com a Red Bull vai até 2028, mas na Fórmula 1 tudo depende da competitividade do carro a cada domingo."',
-    category: 'CONTRACT'
-  },
-  {
-    id: 2,
-    speaker: 'Toto Wolff',
-    role: 'Chefe de Equipe',
-    team: 'Mercedes AMG',
-    date: '2026-09-19',
-    headline: 'Toto Wolff detalha conversas de renovação com Russell e futuro da dupla',
-    quote: '"George é a nossa base e o Kimi é o futuro brilhante que acompanhamos desde o kart. O mercado de pilotos para 2027 estará movimentado, mas nossa prioridade é a estabilidade."',
-    category: 'PRE-RACE'
-  },
-  {
-    id: 3,
-    speaker: 'Lewis Hamilton',
-    role: 'Piloto',
-    team: 'Scuderia Ferrari',
-    date: '2026-09-19',
-    headline: 'Hamilton revela adaptação à cultura e metodologias da Ferrari em Maranello',
-    quote: '"Vestir vermelho é um sentimento inexplicável. A pressão é imensa, mas a paixão da equipe nos impulsiona a buscar cada décimo de segundo no simulador."',
-    category: 'TECH'
-  }
-];
 
 export default function PaddockMarket() {
   const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'CONFIRMED' | 'EXPIRING SOON' | 'RUMORED EXIT'>('ALL');
+  const [contracts, setContracts] = useState<DriverContract[]>([]);
+  const [news, setNews] = useState<LiveNewsItem[]>([]);
+  const [loadingNews, setLoadingNews] = useState(true);
+  const [isLiveFeed, setIsLiveFeed] = useState(false);
 
-  const filteredContracts = CONTRACTS_DATA.filter((c) => {
+  const fetchPaddockData = async () => {
+    setLoadingNews(true);
+    try {
+      // 1. Fetch real news from Live RSS API
+      const newsRes = await fetch('http://localhost:8000/api/v1/paddock/news');
+      if (newsRes.ok) {
+        const newsData = await newsRes.json();
+        if (newsData.items && newsData.items.length > 0) {
+          setNews(newsData.items);
+          setIsLiveFeed(true);
+        }
+      }
+
+      // 2. Fetch real contracts from API
+      const contractsRes = await fetch('http://localhost:8000/api/v1/paddock/contracts');
+      if (contractsRes.ok) {
+        const contractsData = await contractsRes.json();
+        setContracts(contractsData);
+      }
+    } catch (err) {
+      console.error('Erro ao conectar a API do Paddock:', err);
+    } finally {
+      setLoadingNews(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPaddockData();
+  }, []);
+
+  const filteredContracts = contracts.filter((c) => {
     if (selectedFilter === 'ALL') return true;
     return c.status === selectedFilter;
   });
@@ -258,37 +169,53 @@ export default function PaddockMarket() {
           </div>
         </div>
 
-        {/* Press Conferences & Rumors Sidebar (1 col) */}
+        {/* Press Conferences & Live News Sidebar (1 col) */}
         <div className="space-y-4">
-          <div className="bg-[#111] p-4 rounded-xl border border-white/10">
-            <div className="flex items-center space-x-2 mb-3">
-              <Newspaper className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Coletiva de Imprensa FIA</h3>
+          <div className="bg-[#111] p-4 rounded-xl border border-white/10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center space-x-2 mb-1">
+                <Newspaper className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Feed de Imprensa F1 ao Vivo</h3>
+              </div>
+              <p className="text-[11px] text-gray-400">Coletivas e últimas notícias oficiais (Live RSS BBC/FIA)</p>
             </div>
-            <p className="text-[11px] text-gray-400">Transcrições e declarações oficiais direto do Paddock.</p>
+            <button onClick={fetchPaddockData} className="p-1.5 text-gray-500 hover:text-white bg-white/5 rounded-lg transition-all" title="Atualizar Notícias">
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingNews ? 'animate-spin' : ''}`} />
+            </button>
           </div>
 
-          <div className="space-y-3">
-            {PRESS_QUOTES.map((item) => (
-              <div key={item.id} className="bg-[#111] p-4 rounded-xl border border-white/10 hover:border-white/20 transition-all space-y-2">
-                <div className="flex items-center justify-between text-[10px] font-mono text-gray-500">
-                  <span className="text-cyan-400 font-bold uppercase">{item.speaker} ({item.team})</span>
-                  <span>{item.date}</span>
+          {loadingNews ? (
+            <div className="bg-[#111] p-8 rounded-xl border border-white/10 flex flex-col items-center justify-center text-center space-y-2">
+              <RefreshCw className="w-6 h-6 animate-spin text-cyan-400" />
+              <span className="text-xs font-mono text-gray-400 uppercase">Conectando ao Feed da FIA/BBC...</span>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {news.map((item, idx) => (
+                <div key={idx} className="bg-[#111] p-4 rounded-xl border border-white/10 hover:border-white/20 transition-all space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-gray-500">
+                    <span className="text-cyan-400 font-bold uppercase flex items-center space-x-1">
+                      <Radio className="w-2.5 h-2.5 text-red-500 animate-pulse" />
+                      <span>{item.source}</span>
+                    </span>
+                    <span className="text-[9px]">{item.pubDate ? item.pubDate.split(' ').slice(0, 4).join(' ') : 'Hoje'}</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-white leading-snug">{item.title}</h4>
+                  <p className="text-[11px] text-gray-400 italic bg-black/40 p-2.5 rounded-lg border border-white/5 line-clamp-3">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-end text-[9px] font-mono text-gray-500 pt-1">
+                    {item.link && (
+                      <a href={item.link} target="_blank" rel="noreferrer" className="flex items-center space-x-1 text-cyan-400 hover:text-cyan-300 transition-colors">
+                        <span>Ler Notícia Oficial</span>
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <h4 className="text-xs font-bold text-white leading-snug">{item.headline}</h4>
-                <p className="text-[11px] text-gray-400 italic bg-black/40 p-2.5 rounded-lg border border-white/5">
-                  {item.quote}
-                </p>
-                <div className="flex items-center justify-between text-[9px] font-mono text-gray-500 pt-1">
-                  <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 uppercase">{item.category}</span>
-                  <span className="flex items-center space-x-1 text-gray-400 hover:text-white cursor-pointer">
-                    <span>Transcrição Completa</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
