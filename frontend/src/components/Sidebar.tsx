@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { id: 'livetiming', label: 'LIVE TIMING', icon: Clock },
   { id: 'lapevolution', label: 'LAP CHART', icon: TrendingUp },
   { id: 'pitwall', label: 'TELEMETRY', icon: Activity },
+  { id: 'paddock', label: 'PADDOCK MARKET', icon: ActivitySquare },
   { id: 'standings', label: 'CLASSIFICATIONS', icon: Trophy },
   { id: 'races', label: 'CALENDAR', icon: Calendar },
   { id: 'management', label: 'TEAM MGMT', icon: Wrench },

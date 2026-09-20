@@ -9,13 +9,14 @@ import StandingsTable from './StandingsTable';
 import RacesSchedule from './RacesSchedule';
 import TeamsDriversManager from './TeamsDriversManager';
 import OverviewDashboard from './OverviewDashboard';
+import PaddockMarket from './PaddockMarket';
 import { Search, Bell, MonitorPlay } from 'lucide-react';
 import { getAuthToken } from '../lib/api';
 
 // Lazy-load heavy chart components to improve initial load
 const PitWallTelemetry = dynamic(() => import('./PitWallTelemetry'), { ssr: false });
 
-export type DashboardTab = 'overview' | 'livetiming' | 'lapevolution' | 'pitwall' | 'management' | 'standings' | 'races';
+export type DashboardTab = 'overview' | 'livetiming' | 'lapevolution' | 'pitwall' | 'paddock' | 'management' | 'standings' | 'races';
 
 export default function PitWallDashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
@@ -71,6 +72,7 @@ export default function PitWallDashboard() {
           {activeTab === 'livetiming' && <LiveTiming />}
           {activeTab === 'lapevolution' && <OverviewDashboard />}
           {activeTab === 'pitwall' && <PitWallTelemetry />}
+          {activeTab === 'paddock' && <PaddockMarket />}
           {activeTab === 'management' && <TeamsDriversManager />}
           {activeTab === 'standings' && <StandingsTable />}
           {activeTab === 'races' && <RacesSchedule />}
