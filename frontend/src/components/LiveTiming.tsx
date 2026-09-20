@@ -215,12 +215,17 @@ export default function LiveTiming() {
                   </tr>
                 );
               })}
-              {(!data || data.timing.length === 0) && (
+              {(!data || !data.timing || data.timing.length === 0) && (
                 <tr>
-                  <td colSpan={14} className="text-center py-12 text-gray-600 uppercase tracking-widest text-[10px]">
-                    <div className="flex flex-col items-center space-y-2">
-                      <Clock className="w-5 h-5 animate-pulse text-gray-600" />
-                      <span>AWAITING TELEMETRY STREAM...</span>
+                  <td colSpan={14} className="text-center py-16 text-gray-500 uppercase tracking-widest text-xs">
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center border border-white/10">
+                        <Clock className="w-5 h-5 text-gray-500 animate-pulse" />
+                      </div>
+                      <span className="font-bold text-gray-400">NENHUMA CORRIDA EM ANDAMENTO NO MOMENTO</span>
+                      <span className="text-[10px] text-gray-600 lowercase font-mono">
+                        os dados da pista e a tabela de tempos de voltas serão exibidos automaticamente assim que a transmissão iniciar
+                      </span>
                     </div>
                   </td>
                 </tr>
