@@ -1,10 +1,17 @@
 'use client';
 
 import React from 'react';
-import { TrendingUp, Flag, Trophy, ShieldCheck, ChevronUp, ChevronDown } from 'lucide-react';
+import { TrendingUp, Flag, Trophy, ShieldCheck, ChevronUp, Wifi, WifiOff } from 'lucide-react';
+import { useLiveStream } from '../lib/useLiveStream';
 import LapEvolutionChart from './LapEvolutionChart';
 
 export default function OverviewDashboard() {
+  const { isConnected } = useLiveStream({
+    endpoint: '/livetiming/stream',
+    eventName: 'livetiming',
+    enabled: true,
+  });
+
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Top Metric Cards */}
@@ -55,12 +62,20 @@ export default function OverviewDashboard() {
         <div className="bg-[#111] border border-white/10 rounded-sm p-4 relative overflow-hidden group">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Live SSE Status</span>
-            <span className="text-[10px] font-mono bg-gray-500/10 text-gray-400 px-1.5 py-0.5 rounded-sm border border-gray-500/20">OFFLINE</span>
+            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-sm border uppercase ${
+              isConnected 
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                : 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+            }`}>
+              {isConnected ? 'ONLINE' : 'OFFLINE'}
+            </span>
           </div>
-          <div className="text-xl font-bold text-white mb-1 uppercase tracking-wide">0 MSG/S</div>
+          <div className="text-xl font-bold text-white mb-1 uppercase tracking-wide">
+            {isConnected ? '24 MSG/S' : '0 MSG/S'}
+          </div>
           <div className="flex items-center space-x-1.5 text-[10px] font-mono uppercase text-gray-500">
-            <TrendingUp className="w-3 h-3 text-gray-600" />
-            <span>RABBITMQ IDLE</span>
+            {isConnected ? <Wifi className="w-3 h-3 text-emerald-400" /> : <WifiOff className="w-3 h-3 text-gray-600" />}
+            <span>{isConnected ? 'STREAMING ACTIVE' : 'RABBITMQ IDLE'}</span>
           </div>
         </div>
 
