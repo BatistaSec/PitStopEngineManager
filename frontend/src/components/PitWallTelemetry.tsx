@@ -279,7 +279,14 @@ export default function PitWallTelemetry() {
             </span>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-64 w-full relative">
+            {telemetryData.length === 0 && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0c14]/80 rounded-xl border border-dashed border-white/10 backdrop-blur-sm">
+                <Gauge className="w-8 h-8 text-gray-600 animate-pulse mb-2" />
+                <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Aguardando dados de velocidade ao vivo...</span>
+                <span className="text-[10px] text-gray-600 mt-1">Inicie o simulador Python para iniciar a telemetria</span>
+              </div>
+            )}
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={telemetryData}>
                 <defs>
@@ -309,7 +316,14 @@ export default function PitWallTelemetry() {
             </div>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-64 w-full relative">
+            {telemetryData.length === 0 && (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0c14]/80 rounded-xl border border-dashed border-white/10 backdrop-blur-sm">
+                <Flame className="w-8 h-8 text-gray-600 animate-pulse mb-2" />
+                <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Aguardando curva de motor e freios...</span>
+                <span className="text-[10px] text-gray-600 mt-1">Conexão SSE aberta aguardando pacotes de dados</span>
+              </div>
+            )}
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={telemetryData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2a2e3d" />
