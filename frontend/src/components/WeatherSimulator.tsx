@@ -19,13 +19,33 @@ export default function WeatherSimulator({ onWeatherChange }: WeatherSimulatorPr
     setRadioMsg(message);
     if (isAudioMuted || typeof window === 'undefined') return;
 
-    // Web Speech API Voice synthesis for authentic F1 pit wall radio feel
+    // 1. Play realistic F1 Pit Radio Beep using Web Audio API
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime); // 880Hz pitch
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      }
+    } catch {
+      // Audio context fallbacks
+    }
+
+    // 2. Web Speech API Voice synthesis for authentic F1 pit wall radio feel
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel(); // Stop previous voice
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.lang = 'en-US';
-      utterance.rate = 1.1;
-      utterance.pitch = 0.9;
+      utterance.rate = 1.05;
+      utterance.pitch = 0.95;
       window.speechSynthesis.speak(utterance);
     }
   };

@@ -123,6 +123,15 @@ export default function LiveTrackMap() {
             strokeLinecap="round"
             strokeLinejoin="round"
           />
+          {/* DRS Zone Highlight (Green Glow) */}
+          <path
+            d="M 200 120 L 500 150"
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="6"
+            strokeDasharray="4 4"
+            opacity="0.8"
+          />
           {/* Racing Line Apex */}
           <path
             d={CIRCUIT_PATH_D}
@@ -132,6 +141,14 @@ export default function LiveTrackMap() {
             strokeDasharray="8 6"
             opacity="0.4"
           />
+
+          {/* Turn Label Annotations */}
+          <g fontSize="9" fontFamily="monospace" fill="#6b7280">
+            <text x="130" y="415">FINISH LINE 🏁</text>
+            <text x="180" y="100">TURN 1 (HAIRPIN)</text>
+            <text x="510" y="140">DRS ZONE 1 ⚡</text>
+            <text x="595" y="360">TURN 10</text>
+          </g>
 
           {/* Driver Markers moving along the circuit */}
           {Object.values(positions).map((driver) => {
