@@ -51,6 +51,14 @@ services:
       timeout: 5s
       retries: 5
 
+  predictive_ai:
+    build:
+      context: ./services/predictive-ai-engine
+    container_name: pitstop_predictive_ai
+    ports:
+      - "8000:8000"
+
+
 volumes:
   postgres_data:
   mysql_data:
