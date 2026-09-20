@@ -6,11 +6,11 @@ DELETE FROM circuits;
 DELETE FROM drivers;
 DELETE FROM teams;
 
-ALTER SEQUENCE teams_id_seq RESTART WITH 100;
-ALTER SEQUENCE drivers_id_seq RESTART WITH 100;
-ALTER SEQUENCE circuits_id_seq RESTART WITH 100;
-ALTER SEQUENCE races_id_seq RESTART WITH 100;
-ALTER SEQUENCE race_results_id_seq RESTART WITH 1000;
+ALTER TABLE teams ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE drivers ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE circuits ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE races ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE race_results ALTER COLUMN id RESTART WITH 1000;
 
 INSERT INTO teams (id, name, country, base_location, power_unit) VALUES (1, 'Mercedes AMG', 'Germany', 'Brackley, UK', 'Mercedes');
 INSERT INTO teams (id, name, country, base_location, power_unit) VALUES (2, 'Scuderia Ferrari', 'Italy', 'Maranello, ITA', 'Ferrari');
@@ -45,7 +45,7 @@ INSERT INTO drivers (id, code, permanent_number, first_name, last_name, national
 INSERT INTO drivers (id, code, permanent_number, first_name, last_name, nationality, team_id) VALUES (19, 'BOR', 5, 'Gabriel', 'Bortoleto', 'Brazilian', 8);
 INSERT INTO drivers (id, code, permanent_number, first_name, last_name, nationality, team_id) VALUES (20, 'STR', 18, 'Lance', 'Stroll', 'Canadian', 10);
 INSERT INTO drivers (id, code, permanent_number, first_name, last_name, nationality, team_id) VALUES (21, 'HER', 26, 'Colton', 'Herta', 'American', 11);
-INSERT INTO drivers (id, code, permanent_number, first_name, last_name, nationality, team_id) VALUES (22, 'OWA', 28, 'Pato', 'O'Ward', 'Mexican', 11);
+INSERT INTO drivers (id, code, permanent_number, first_name, last_name, nationality, team_id) VALUES (22, 'OWA', 28, 'Pato', 'O''Ward', 'Mexican', 11);
 
 INSERT INTO circuits (id, name, location, country, length_km, laps) VALUES (1, 'Albert Park', 'Unknown', 'Unknown', 5.0, 50);
 INSERT INTO races (id, season, round, name, date, circuit_id, completed) VALUES (1, 2026, 1, 'Australian GP', '2026-03-08', 1, true);

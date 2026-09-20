@@ -119,26 +119,26 @@ export default function LapEvolutionChart() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="bg-[#141722] rounded-2xl p-4 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#111] rounded-sm p-4 border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <TrendingUp className="w-5 h-5 text-cyan-400" />
+          <TrendingUp className="w-5 h-5 text-gray-500" />
           <div>
-            <h2 className="text-lg font-extrabold text-white">LAP EVOLUTION</h2>
-            <p className="text-[10px] text-gray-500 font-mono">PACE COMPARISON • {totalLaps} LAPS • PIT STOPS VISIBLE</p>
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">LAP EVOLUTION</h2>
+            <p className="text-[10px] text-gray-500 font-mono tracking-widest">PACE COMPARISON • {totalLaps} LAPS • PIT STOPS VISIBLE</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
           <button
             onClick={selectAll}
-            className="flex items-center space-x-1 text-[10px] font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-all"
+            className="flex items-center space-x-1 text-[10px] font-mono px-3 py-1.5 rounded-sm bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-all uppercase"
           >
             <Eye className="w-3 h-3" />
             <span>ALL</span>
           </button>
           <button
             onClick={selectNone}
-            className="flex items-center space-x-1 text-[10px] font-mono px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-all"
+            className="flex items-center space-x-1 text-[10px] font-mono px-3 py-1.5 rounded-sm bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-all uppercase"
           >
             <EyeOff className="w-3 h-3" />
             <span>RESET</span>
@@ -154,39 +154,38 @@ export default function LapEvolutionChart() {
             <button
               key={driver.code}
               onClick={() => toggleDriver(driver.code)}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border transition-all ${
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-sm text-xs font-mono font-semibold border transition-all ${
                 isActive
-                  ? 'border-white/20 bg-white/10 text-white shadow-lg'
-                  : 'border-white/5 bg-white/[0.02] text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                  ? 'border-white/20 bg-white/10 text-white'
+                  : 'border-white/5 bg-[#0a0a0a] text-gray-500 hover:text-gray-300 hover:bg-white/5'
               }`}
             >
               <span
-                className="w-3 h-3 rounded-full shrink-0"
-                style={{ backgroundColor: isActive ? driver.color : '#555' }}
+                className="w-2.5 h-2.5 rounded-sm shrink-0"
+                style={{ backgroundColor: isActive ? driver.color : '#333' }}
               />
-              <span>{driver.code}</span>
-              <span className="text-[10px] text-gray-500 hidden sm:inline">{driver.team}</span>
+              <span className="uppercase tracking-widest">{driver.code}</span>
             </button>
           );
         })}
       </div>
 
       {/* Chart */}
-      <div className="bg-[#141722] rounded-2xl p-4 sm:p-6 border border-white/10">
+      <div className="bg-[#111] rounded-sm p-4 sm:p-6 border border-white/10">
         <ResponsiveContainer width="100%" height={420}>
           <LineChart data={lapData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e2132" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#222" />
             <XAxis
               dataKey="lap"
-              stroke="#4a5568"
-              tick={{ fill: '#9ca3af', fontSize: 10 }}
-              label={{ value: 'Volta', position: 'insideBottom', offset: -2, style: { fill: '#6b7280', fontSize: 11 } }}
+              stroke="#444"
+              tick={{ fill: '#888', fontSize: 10, fontFamily: 'monospace' }}
+              label={{ value: 'LAP', position: 'insideBottom', offset: -2, style: { fill: '#666', fontSize: 10, fontFamily: 'monospace', textTransform: 'uppercase' } }}
             />
             <YAxis
               domain={yDomain as [number, number]}
-              stroke="#4a5568"
-              tick={{ fill: '#9ca3af', fontSize: 10 }}
-              label={{ value: 'Tempo (s)', angle: -90, position: 'insideLeft', style: { fill: '#6b7280', fontSize: 11 } }}
+              stroke="#444"
+              tick={{ fill: '#888', fontSize: 10, fontFamily: 'monospace' }}
+              label={{ value: 'TIME (S)', angle: -90, position: 'insideLeft', style: { fill: '#666', fontSize: 10, fontFamily: 'monospace', textTransform: 'uppercase' } }}
               tickFormatter={(value: number) => {
                 const mins = Math.floor(value / 60);
                 const secs = (value % 60).toFixed(0);
@@ -195,25 +194,25 @@ export default function LapEvolutionChart() {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1a1d2e',
+                backgroundColor: '#050505',
                 border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
+                borderRadius: '2px',
                 color: '#fff',
                 fontSize: '11px',
                 fontFamily: 'monospace',
               }}
-              labelStyle={{ color: '#9ca3af', fontWeight: 'bold' }}
-              labelFormatter={(label) => `Volta ${label}`}
+              labelStyle={{ color: '#888', fontWeight: 'normal', textTransform: 'uppercase', marginBottom: '8px' }}
+              labelFormatter={(label) => `LAP ${label}`}
               formatter={(value: any, name: any) => {
                 const num = Number(value);
                 const mins = Math.floor(num / 60);
                 const secs = (num % 60).toFixed(3);
                 const formatted = mins > 0 ? `${mins}:${secs.padStart(6, '0')}` : `${num.toFixed(3)}s`;
-                return [formatted, String(name)];
+                return [formatted, String(name).toUpperCase()];
               }}
             />
             <Legend
-              wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace', paddingTop: '10px' }}
+              wrapperStyle={{ fontSize: '10px', fontFamily: 'monospace', paddingTop: '20px', textTransform: 'uppercase', letterSpacing: '1px' }}
             />
             {DRIVER_CONFIGS.filter((d) => activeDrivers.has(d.code)).map((driver) => (
               <Line
@@ -222,9 +221,9 @@ export default function LapEvolutionChart() {
                 dataKey={driver.code}
                 name={driver.code}
                 stroke={driver.color}
-                strokeWidth={2}
+                strokeWidth={1.5}
                 dot={false}
-                activeDot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 3, strokeWidth: 1.5, stroke: '#050505' }}
                 connectNulls
               />
             ))}

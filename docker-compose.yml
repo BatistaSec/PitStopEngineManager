@@ -16,6 +16,24 @@ services:
       timeout: 5s
       retries: 5
 
+  mysql:
+    image: mysql:8.0
+    container_name: pitstop_mysql
+    environment:
+      MYSQL_DATABASE: pitstop_telemetry
+      MYSQL_USER: pitstop
+      MYSQL_PASSWORD: pitstop_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: pitstop_rabbitmq
@@ -35,4 +53,5 @@ services:
 
 volumes:
   postgres_data:
+  mysql_data:
   rabbitmq_data:

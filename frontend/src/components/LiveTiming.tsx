@@ -50,10 +50,10 @@ const SECTOR_COLORS: Record<string, string> = {
 };
 
 const TRACK_STATUS_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
-  GREEN: { bg: 'bg-emerald-500/15 border-emerald-500/30', text: 'text-emerald-400', icon: <Flag className="w-3.5 h-3.5" />, label: 'GREEN FLAG' },
-  YELLOW: { bg: 'bg-yellow-500/15 border-yellow-500/30', text: 'text-yellow-400', icon: <AlertTriangle className="w-3.5 h-3.5" />, label: 'YELLOW FLAG' },
-  VSC: { bg: 'bg-yellow-500/20 border-yellow-400/40', text: 'text-yellow-300', icon: <AlertTriangle className="w-3.5 h-3.5" />, label: 'VIRTUAL SAFETY CAR' },
-  SC: { bg: 'bg-orange-500/20 border-orange-400/40', text: 'text-orange-300', icon: <AlertTriangle className="w-3.5 h-3.5" />, label: 'SAFETY CAR' },
+  GREEN: { bg: 'bg-emerald-500/15 border-emerald-500/30', text: 'text-emerald-400', icon: <Flag className="w-3 h-3" />, label: 'GREEN FLAG' },
+  YELLOW: { bg: 'bg-yellow-500/15 border-yellow-500/30', text: 'text-yellow-400', icon: <AlertTriangle className="w-3 h-3" />, label: 'YELLOW FLAG' },
+  VSC: { bg: 'bg-yellow-500/20 border-yellow-400/40', text: 'text-yellow-300', icon: <AlertTriangle className="w-3 h-3" />, label: 'VIRTUAL SAFETY CAR' },
+  SC: { bg: 'bg-orange-500/20 border-orange-400/40', text: 'text-orange-300', icon: <AlertTriangle className="w-3 h-3" />, label: 'SAFETY CAR' },
 };
 
 const TEAM_COLORS: Record<string, string> = {
@@ -85,67 +85,67 @@ export default function LiveTiming() {
   return (
     <div className="space-y-4">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#141722] rounded-2xl p-4 border border-white/10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#111] rounded-sm p-3 border border-white/10">
         <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-extrabold text-white flex items-center space-x-2">
-            <Clock className="w-5 h-5 text-red-500" />
-            <span>LIVE TIMING</span>
+          <h2 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-gray-400" />
+            <span>LIVE TIMING TOWER</span>
           </h2>
           {data && (
-            <div className={`flex items-center space-x-2 text-xs font-mono px-3 py-1.5 rounded-xl border ${trackStatus.bg} ${trackStatus.text}`}>
+            <div className={`flex items-center space-x-1.5 text-[10px] font-mono px-2 py-1 rounded-sm border uppercase ${trackStatus.bg} ${trackStatus.text}`}>
               {trackStatus.icon}
               <span>{trackStatus.label}</span>
             </div>
           )}
         </div>
 
-        <div className="flex items-center space-x-4 text-xs font-mono">
+        <div className="flex items-center space-x-4 text-[10px] uppercase font-mono">
           {data && (
             <>
-              <span className="text-gray-400">
+              <span className="text-gray-500">
                 LAP <span className="text-white font-bold">{data.currentLap}</span>/{data.totalLaps}
               </span>
-              <span className="text-gray-500">|</span>
-              <span className="text-gray-400">{data.sessionTime}</span>
+              <span className="text-gray-700">|</span>
+              <span className="text-gray-500">{data.sessionTime}</span>
             </>
           )}
-          <div className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-lg border ${
+          <div className={`flex items-center space-x-1.5 px-2 py-1 rounded-sm border uppercase ${
             isConnected
               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
               : 'border-red-500/30 bg-red-500/10 text-red-400'
           }`}>
-            {isConnected ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-            <span>{isConnected ? 'SSE LIVE' : 'OFFLINE'}</span>
+            {isConnected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+            <span>{isConnected ? 'SSE CONNECTED' : 'OFFLINE'}</span>
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono px-4 py-2 rounded-xl">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono px-4 py-2 rounded-sm uppercase tracking-wide">
           {error}
         </div>
       )}
 
       {/* Timing Table */}
-      <div className="bg-[#141722] rounded-2xl border border-white/10 overflow-hidden">
+      <div className="bg-[#111] rounded-sm border border-white/10 overflow-hidden">
         <div className="overflow-x-auto scrollbar-hide">
-          <table className="w-full text-xs font-mono">
+          <table className="w-full text-[11px] font-mono border-collapse">
             <thead>
-              <tr className="bg-[#1a1d2e] text-gray-400 uppercase tracking-wider">
-                <th className="px-3 py-3 text-left w-10">POS</th>
-                <th className="px-2 py-3 text-left w-10">N°</th>
-                <th className="px-3 py-3 text-left min-w-[140px]">DRIVER</th>
-                <th className="px-3 py-3 text-left hidden lg:table-cell">TEAM</th>
-                <th className="px-3 py-3 text-right">GAP</th>
-                <th className="px-3 py-3 text-right">INT</th>
-                <th className="px-3 py-3 text-right">LAST LAP</th>
-                <th className="px-3 py-3 text-right hidden md:table-cell">BEST</th>
-                <th className="px-2 py-3 text-center hidden xl:table-cell">S1</th>
-                <th className="px-2 py-3 text-center hidden xl:table-cell">S2</th>
-                <th className="px-2 py-3 text-center hidden xl:table-cell">S3</th>
-                <th className="px-2 py-3 text-center">TYRE</th>
-                <th className="px-2 py-3 text-center hidden sm:table-cell">PITS</th>
-                <th className="px-2 py-3 text-center hidden sm:table-cell">STS</th>
+              <tr className="bg-[#1a1a1a] text-gray-500 uppercase tracking-widest border-b border-white/10">
+                <th className="px-3 py-2 text-center w-10">P</th>
+                <th className="px-2 py-2 text-center w-10">#</th>
+                <th className="px-3 py-2 text-left min-w-[140px]">DRIVER</th>
+                <th className="px-3 py-2 text-left hidden lg:table-cell">TEAM</th>
+                <th className="px-3 py-2 text-right">GAP</th>
+                <th className="px-3 py-2 text-right">INT</th>
+                <th className="px-3 py-2 text-right">LAST</th>
+                <th className="px-3 py-2 text-right hidden md:table-cell">BEST</th>
+                <th className="px-2 py-2 text-center hidden xl:table-cell">S1</th>
+                <th className="px-2 py-2 text-center hidden xl:table-cell">S2</th>
+                <th className="px-2 py-2 text-center hidden xl:table-cell">S3</th>
+                <th className="px-2 py-2 text-center">TYRE</th>
+                <th className="px-2 py-2 text-center hidden sm:table-cell">PIT</th>
+                <th className="px-2 py-2 text-center hidden sm:table-cell">STS</th>
               </tr>
             </thead>
             <tbody>
@@ -162,49 +162,49 @@ export default function LiveTiming() {
                       isLeader ? 'bg-yellow-500/5' : ''
                     }`}
                   >
-                    <td className="px-3 py-2.5">
-                      <span className={`font-bold text-sm ${
-                        isPodium ? 'text-yellow-400' : 'text-gray-300'
+                    <td className="px-3 py-1.5 text-center">
+                      <span className={`font-bold ${
+                        isPodium ? 'text-yellow-500' : 'text-gray-400'
                       }`}>
-                        P{entry.position}
+                        {entry.position.toString().padStart(2, '0')}
                       </span>
                     </td>
-                    <td className="px-2 py-2.5 text-gray-500">{entry.number}</td>
-                    <td className="px-3 py-2.5">
+                    <td className="px-2 py-1.5 text-center text-gray-600">{entry.number}</td>
+                    <td className="px-3 py-1.5">
                       <div className="flex items-center space-x-2">
-                        <span className="text-cyan-400 font-bold">{entry.code}</span>
-                        <span className="text-gray-300 hidden sm:inline">{entry.driver.split(' ').slice(-1)[0]}</span>
+                        <span className="text-cyan-500 font-bold">{entry.code}</span>
+                        <span className="text-gray-400 hidden sm:inline uppercase tracking-wider">{entry.driver.split(' ').slice(-1)[0]}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-2.5 text-gray-500 hidden lg:table-cell text-[11px]">{entry.team}</td>
-                    <td className="px-3 py-2.5 text-right">
-                      <span className={isLeader ? 'text-yellow-400 font-bold' : 'text-red-400'}>
+                    <td className="px-3 py-1.5 text-gray-500 hidden lg:table-cell uppercase tracking-wider text-[9px]">{entry.team}</td>
+                    <td className="px-3 py-1.5 text-right">
+                      <span className={isLeader ? 'text-yellow-500 font-bold' : 'text-gray-300'}>
                         {entry.gap}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-right text-gray-400">{entry.interval}</td>
-                    <td className="px-3 py-2.5 text-right text-white font-semibold">{entry.lastLap}</td>
-                    <td className="px-3 py-2.5 text-right text-purple-400 hidden md:table-cell">{entry.bestLap}</td>
+                    <td className="px-3 py-1.5 text-right text-gray-500">{entry.interval}</td>
+                    <td className="px-3 py-1.5 text-right text-white font-semibold">{entry.lastLap}</td>
+                    <td className="px-3 py-1.5 text-right text-purple-400 hidden md:table-cell">{entry.bestLap}</td>
                     {['s1', 's2', 's3'].map((sector) => (
-                      <td key={sector} className="px-2 py-2.5 text-center hidden xl:table-cell">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                      <td key={sector} className="px-2 py-1.5 text-center hidden xl:table-cell">
+                        <span className={`px-1.5 py-0.5 rounded-sm text-[9px] uppercase tracking-wider ${
                           SECTOR_COLORS[entry[`${sector}Color` as keyof TimingEntry] as string] || SECTOR_COLORS.YELLOW
                         }`}>
                           {entry[sector as keyof TimingEntry]}
                         </span>
                       </td>
                     ))}
-                    <td className="px-2 py-2.5 text-center">
+                    <td className="px-2 py-1.5 text-center">
                       <div className="flex items-center justify-center space-x-1">
-                        <span className={`w-4 h-4 rounded-full ${tyre.bg} flex items-center justify-center text-[9px] font-bold text-black`}>
+                        <span className={`w-3.5 h-3.5 rounded-sm ${tyre.bg} flex items-center justify-center text-[9px] font-bold text-black`}>
                           {tyre.label}
                         </span>
-                        <span className="text-gray-500 text-[10px]">{entry.tyreAge}</span>
+                        <span className="text-gray-500 text-[9px]">{entry.tyreAge}L</span>
                       </div>
                     </td>
-                    <td className="px-2 py-2.5 text-center text-gray-400 hidden sm:table-cell">{entry.pits}</td>
-                    <td className="px-2 py-2.5 text-center hidden sm:table-cell">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                    <td className="px-2 py-1.5 text-center text-gray-500 hidden sm:table-cell">{entry.pits}</td>
+                    <td className="px-2 py-1.5 text-center hidden sm:table-cell">
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-sm uppercase tracking-wider ${
                         entry.status === 'TRACK' ? 'bg-emerald-500/15 text-emerald-400' :
                         entry.status === 'PIT' ? 'bg-yellow-500/15 text-yellow-400' :
                         'bg-red-500/15 text-red-400'
@@ -217,10 +217,10 @@ export default function LiveTiming() {
               })}
               {(!data || data.timing.length === 0) && (
                 <tr>
-                  <td colSpan={14} className="text-center py-12 text-gray-500">
+                  <td colSpan={14} className="text-center py-12 text-gray-600 uppercase tracking-widest text-[10px]">
                     <div className="flex flex-col items-center space-y-2">
-                      <Clock className="w-8 h-8 animate-pulse" />
-                      <span>Aguardando dados do Live Timing via SSE...</span>
+                      <Clock className="w-5 h-5 animate-pulse text-gray-600" />
+                      <span>AWAITING TELEMETRY STREAM...</span>
                     </div>
                   </td>
                 </tr>

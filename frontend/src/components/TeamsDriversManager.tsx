@@ -161,99 +161,99 @@ export default function TeamsDriversManager() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="bg-[#141722] rounded-2xl p-4 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="bg-[#111] rounded-sm p-3 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
-          <Users className="w-5 h-5 text-emerald-400" />
+          <Users className="w-4 h-4 text-gray-400" />
           <div>
-            <h2 className="text-lg font-extrabold text-white">GESTÃO DE PILOTOS & EQUIPES</h2>
-            <p className="text-[10px] text-gray-500 font-mono">CRUD COMPLETO VIA REST API</p>
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">TEAM & DRIVER MANAGEMENT</h2>
+            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest">CRUD VIA REST API</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          <div className="flex bg-white/5 rounded-xl border border-white/10 p-0.5">
+          <div className="flex bg-[#0a0a0a] rounded-sm border border-white/10 p-0.5">
             <button
               onClick={() => setTab('teams')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                tab === 'teams' ? 'bg-[#e10600] text-white shadow-lg shadow-red-600/20' : 'text-gray-400 hover:text-white'
+              className={`flex items-center space-x-1.5 px-3 py-1 rounded-sm text-[10px] font-mono uppercase transition-all ${
+                tab === 'teams' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'
               }`}
             >
-              <Car className="w-3.5 h-3.5" />
-              <span>Equipes ({teams.length})</span>
+              <Car className="w-3 h-3" />
+              <span>TEAMS ({teams.length})</span>
             </button>
             <button
               onClick={() => setTab('drivers')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                tab === 'drivers' ? 'bg-[#e10600] text-white shadow-lg shadow-red-600/20' : 'text-gray-400 hover:text-white'
+              className={`flex items-center space-x-1.5 px-3 py-1 rounded-sm text-[10px] font-mono uppercase transition-all ${
+                tab === 'drivers' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'
               }`}
             >
-              <Users className="w-3.5 h-3.5" />
-              <span>Pilotos ({drivers.length})</span>
+              <Users className="w-3 h-3" />
+              <span>DRIVERS ({drivers.length})</span>
             </button>
           </div>
 
           <button
             onClick={openCreateModal}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-600/20"
+            className="flex items-center space-x-1.5 px-3 py-1 rounded-sm bg-white hover:bg-gray-200 text-black text-[10px] font-mono font-bold transition-all uppercase"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Adicionar</span>
+            <Plus className="w-3 h-3" />
+            <span>ADD NEW</span>
           </button>
         </div>
       </div>
 
       {/* Feedback Toast */}
       {feedback && (
-        <div className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-mono border transition-all ${
+        <div className={`flex items-center space-x-2 px-4 py-2 rounded-sm text-[10px] font-mono border uppercase tracking-wider transition-all ${
           feedback.type === 'success'
             ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
             : 'bg-red-500/10 border-red-500/30 text-red-400'
         }`}>
-          {feedback.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          {feedback.type === 'success' ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
           <span>{feedback.message}</span>
         </div>
       )}
 
       {/* Teams Table */}
       {tab === 'teams' && (
-        <div className="bg-[#141722] rounded-2xl border border-white/10 overflow-hidden">
+        <div className="bg-[#111] rounded-sm border border-white/10 overflow-hidden">
           {loadingTeams ? (
-            <div className="flex items-center justify-center py-16 text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin mr-2" />
-              <span className="font-mono text-sm">Carregando equipes...</span>
+            <div className="flex items-center justify-center py-16 text-gray-500 uppercase tracking-widest text-[10px]">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              <span className="font-mono">LOADING TEAMS...</span>
             </div>
           ) : teams.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-500 space-y-3">
-              <Car className="w-10 h-10" />
-              <span className="font-mono text-sm">Nenhuma escuderia cadastrada. Clique em &quot;Adicionar&quot; para começar.</span>
+            <div className="flex flex-col items-center justify-center py-16 text-gray-500 space-y-3 uppercase tracking-widest text-[10px]">
+              <Car className="w-8 h-8 opacity-50" />
+              <span className="font-mono">NO TEAMS FOUND. CLICK "ADD NEW" TO START.</span>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#1a1d2e] text-gray-400 text-xs uppercase tracking-wider font-mono">
+                  <tr className="bg-[#1a1a1a] text-gray-500 text-[10px] uppercase tracking-widest font-mono border-b border-white/10">
                     <th className="px-4 py-3 text-left">ID</th>
-                    <th className="px-4 py-3 text-left">Nome</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">País</th>
-                    <th className="px-4 py-3 text-left hidden md:table-cell">Base</th>
-                    <th className="px-4 py-3 text-left hidden lg:table-cell">Power Unit</th>
-                    <th className="px-4 py-3 text-center">Ações</th>
+                    <th className="px-4 py-3 text-left">TEAM NAME</th>
+                    <th className="px-4 py-3 text-left hidden sm:table-cell">COUNTRY</th>
+                    <th className="px-4 py-3 text-left hidden md:table-cell">BASE</th>
+                    <th className="px-4 py-3 text-left hidden lg:table-cell">PU</th>
+                    <th className="px-4 py-3 text-center">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {teams.map((team) => (
                     <tr key={team.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3 text-gray-500 font-mono text-xs">{team.id}</td>
-                      <td className="px-4 py-3 text-white font-semibold">{team.name}</td>
-                      <td className="px-4 py-3 text-gray-400 hidden sm:table-cell">{team.country}</td>
-                      <td className="px-4 py-3 text-gray-400 hidden md:table-cell text-xs">{team.baseLocation}</td>
-                      <td className="px-4 py-3 text-cyan-400 font-mono text-xs hidden lg:table-cell">{team.powerUnit}</td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-2.5 text-gray-600 font-mono text-[10px]">{team.id}</td>
+                      <td className="px-4 py-2.5 text-white font-medium uppercase tracking-wide text-xs">{team.name}</td>
+                      <td className="px-4 py-2.5 text-gray-500 font-mono text-[10px] uppercase hidden sm:table-cell">{team.country}</td>
+                      <td className="px-4 py-2.5 text-gray-500 hidden md:table-cell font-mono text-[10px] uppercase">{team.baseLocation}</td>
+                      <td className="px-4 py-2.5 text-cyan-500 font-mono text-[10px] uppercase hidden lg:table-cell">{team.powerUnit}</td>
+                      <td className="px-4 py-2.5 text-center">
                         <div className="flex items-center justify-center space-x-2">
-                          <button onClick={() => openEditModal(team)} className="p-1.5 rounded-lg bg-white/5 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 transition-all" title="Editar">
+                          <button onClick={() => openEditModal(team)} className="p-1 rounded-sm bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all border border-transparent hover:border-white/10" title="Edit">
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDeleteTeam(team)} className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all" title="Remover">
+                          <button onClick={() => handleDeleteTeam(team)} className="p-1 rounded-sm bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all border border-transparent hover:border-red-500/30" title="Delete">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -269,44 +269,44 @@ export default function TeamsDriversManager() {
 
       {/* Drivers Table */}
       {tab === 'drivers' && (
-        <div className="bg-[#141722] rounded-2xl border border-white/10 overflow-hidden">
+        <div className="bg-[#111] rounded-sm border border-white/10 overflow-hidden">
           {loadingDrivers ? (
-            <div className="flex items-center justify-center py-16 text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin mr-2" />
-              <span className="font-mono text-sm">Carregando pilotos...</span>
+            <div className="flex items-center justify-center py-16 text-gray-500 uppercase tracking-widest text-[10px]">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              <span className="font-mono">LOADING DRIVERS...</span>
             </div>
           ) : drivers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-500 space-y-3">
-              <Users className="w-10 h-10" />
-              <span className="font-mono text-sm">Nenhum piloto cadastrado. Clique em &quot;Adicionar&quot; para começar.</span>
+            <div className="flex flex-col items-center justify-center py-16 text-gray-500 space-y-3 uppercase tracking-widest text-[10px]">
+              <Users className="w-8 h-8 opacity-50" />
+              <span className="font-mono">NO DRIVERS FOUND. CLICK "ADD NEW" TO START.</span>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#1a1d2e] text-gray-400 text-xs uppercase tracking-wider font-mono">
-                    <th className="px-4 py-3 text-left">N°</th>
-                    <th className="px-4 py-3 text-left">Código</th>
-                    <th className="px-4 py-3 text-left">Nome</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Nacionalidade</th>
-                    <th className="px-4 py-3 text-left hidden md:table-cell">Equipe</th>
-                    <th className="px-4 py-3 text-center">Ações</th>
+                  <tr className="bg-[#1a1a1a] text-gray-500 text-[10px] uppercase tracking-widest font-mono border-b border-white/10">
+                    <th className="px-4 py-3 text-left">#</th>
+                    <th className="px-4 py-3 text-left">CODE</th>
+                    <th className="px-4 py-3 text-left">NAME</th>
+                    <th className="px-4 py-3 text-left hidden sm:table-cell">NAT</th>
+                    <th className="px-4 py-3 text-left hidden md:table-cell">TEAM</th>
+                    <th className="px-4 py-3 text-center">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {drivers.map((driver) => (
                     <tr key={driver.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3 text-yellow-400 font-bold font-mono">{driver.permanentNumber}</td>
-                      <td className="px-4 py-3 text-cyan-400 font-bold font-mono">{driver.code}</td>
-                      <td className="px-4 py-3 text-white font-semibold">{driver.firstName} {driver.lastName}</td>
-                      <td className="px-4 py-3 text-gray-400 hidden sm:table-cell">{driver.nationality}</td>
-                      <td className="px-4 py-3 text-gray-400 hidden md:table-cell text-xs">{driver.teamName || `ID: ${driver.teamId}`}</td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-2.5 text-gray-500 font-mono text-[10px]">{driver.permanentNumber}</td>
+                      <td className="px-4 py-2.5 text-cyan-500 font-bold font-mono text-[10px]">{driver.code}</td>
+                      <td className="px-4 py-2.5 text-white font-medium uppercase tracking-wide text-xs">{driver.firstName} {driver.lastName}</td>
+                      <td className="px-4 py-2.5 text-gray-500 font-mono text-[10px] uppercase hidden sm:table-cell">{driver.nationality}</td>
+                      <td className="px-4 py-2.5 text-gray-500 font-mono text-[10px] uppercase hidden md:table-cell">{driver.teamName || `ID: ${driver.teamId}`}</td>
+                      <td className="px-4 py-2.5 text-center">
                         <div className="flex items-center justify-center space-x-2">
-                          <button onClick={() => openEditModal(driver)} className="p-1.5 rounded-lg bg-white/5 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 transition-all" title="Editar">
+                          <button onClick={() => openEditModal(driver)} className="p-1 rounded-sm bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all border border-transparent hover:border-white/10" title="Edit">
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDeleteDriver(driver)} className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all" title="Remover">
+                          <button onClick={() => handleDeleteDriver(driver)} className="p-1 rounded-sm bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-all border border-transparent hover:border-red-500/30" title="Delete">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -322,15 +322,15 @@ export default function TeamsDriversManager() {
 
       {/* Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#141722] border border-white/10 rounded-3xl w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#111] border border-white/10 rounded-sm w-full max-w-lg shadow-2xl">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-white/10">
-              <h3 className="text-lg font-bold text-white">
-                {modalMode === 'create' ? 'Adicionar' : 'Editar'} {tab === 'teams' ? 'Escuderia' : 'Piloto'}
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                {modalMode === 'create' ? 'ADD' : 'EDIT'} {tab === 'teams' ? 'TEAM' : 'DRIVER'}
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white p-1 transition-colors">
-                <X className="w-5 h-5" />
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white p-1 transition-colors">
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -339,41 +339,41 @@ export default function TeamsDriversManager() {
               {tab === 'teams' ? (
                 <>
                   <div>
-                    <label className="block text-xs text-gray-400 font-mono mb-1.5">Nome da Escuderia</label>
+                    <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Team Name</label>
                     <input
                       type="text" value={editingTeam.name}
                       onChange={(e) => setEditingTeam({ ...editingTeam, name: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                      placeholder="Ex: Red Bull Racing"
+                      className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                      placeholder="e.g. Red Bull Racing"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">País</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Country</label>
                       <input
                         type="text" value={editingTeam.country}
                         onChange={(e) => setEditingTeam({ ...editingTeam, country: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                        placeholder="Ex: Austria"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                        placeholder="e.g. Austria"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">Power Unit</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Power Unit</label>
                       <input
                         type="text" value={editingTeam.powerUnit}
                         onChange={(e) => setEditingTeam({ ...editingTeam, powerUnit: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                        placeholder="Ex: Honda RBPT"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                        placeholder="e.g. Honda RBPT"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 font-mono mb-1.5">Base</label>
+                    <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Base</label>
                     <input
                       type="text" value={editingTeam.baseLocation}
                       onChange={(e) => setEditingTeam({ ...editingTeam, baseLocation: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                      placeholder="Ex: Milton Keynes, UK"
+                      className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                      placeholder="e.g. Milton Keynes, UK"
                     />
                   </div>
                 </>
@@ -381,64 +381,64 @@ export default function TeamsDriversManager() {
                 <>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">Primeiro Nome</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">First Name</label>
                       <input
                         type="text" value={editingDriver.firstName}
                         onChange={(e) => setEditingDriver({ ...editingDriver, firstName: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                        placeholder="Ex: Max"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                        placeholder="e.g. Max"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">Sobrenome</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Last Name</label>
                       <input
                         type="text" value={editingDriver.lastName}
                         onChange={(e) => setEditingDriver({ ...editingDriver, lastName: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                        placeholder="Ex: Verstappen"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                        placeholder="e.g. Verstappen"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">Código</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Code</label>
                       <input
                         type="text" value={editingDriver.code} maxLength={3}
                         onChange={(e) => setEditingDriver({ ...editingDriver, code: e.target.value.toUpperCase() })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-mono uppercase"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono uppercase"
                         placeholder="VER"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">Número</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Number</label>
                       <input
                         type="number" value={editingDriver.permanentNumber || ''}
                         onChange={(e) => setEditingDriver({ ...editingDriver, permanentNumber: parseInt(e.target.value) || 0 })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-mono"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
                         placeholder="1"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-400 font-mono mb-1.5">Equipe ID</label>
+                      <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Team</label>
                       <select
                         value={editingDriver.teamId || ''}
                         onChange={(e) => setEditingDriver({ ...editingDriver, teamId: parseInt(e.target.value) || 0 })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
+                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-gray-300 text-xs outline-none focus:border-white/30 transition-all font-mono"
                       >
-                        <option value="" className="bg-[#141722]">Selecionar...</option>
+                        <option value="">SELECT...</option>
                         {teams.map((t) => (
-                          <option key={t.id} value={t.id} className="bg-[#141722]">{t.name}</option>
+                          <option key={t.id} value={t.id}>{t.name}</option>
                         ))}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 font-mono mb-1.5">Nacionalidade</label>
+                    <label className="block text-[10px] text-gray-500 font-mono mb-1.5 uppercase tracking-wider">Nationality</label>
                     <input
                       type="text" value={editingDriver.nationality}
                       onChange={(e) => setEditingDriver({ ...editingDriver, nationality: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
-                      placeholder="Ex: Dutch"
+                      className="w-full bg-[#0a0a0a] border border-white/10 rounded-sm px-3 py-2 text-white text-xs outline-none focus:border-white/30 transition-all font-mono"
+                      placeholder="e.g. Dutch"
                     />
                   </div>
                 </>
@@ -446,20 +446,20 @@ export default function TeamsDriversManager() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end space-x-3 p-5 border-t border-white/10">
+            <div className="flex items-center justify-end space-x-2 p-4 border-t border-white/10 bg-[#0a0a0a]">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 text-sm font-semibold border border-white/10 transition-all"
+                className="px-4 py-1.5 rounded-sm bg-transparent hover:bg-white/5 text-gray-400 text-[10px] font-mono font-semibold border border-transparent hover:border-white/10 transition-all uppercase"
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 onClick={tab === 'teams' ? handleSaveTeam : handleSaveDriver}
                 disabled={saving}
-                className="flex items-center space-x-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 disabled:opacity-50"
+                className="flex items-center space-x-1.5 px-4 py-1.5 rounded-sm bg-white hover:bg-gray-200 text-black text-[10px] font-mono font-bold transition-all disabled:opacity-50 uppercase"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                <span>{saving ? 'Salvando...' : 'Salvar'}</span>
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                <span>{saving ? 'SAVING...' : 'SAVE'}</span>
               </button>
             </div>
           </div>

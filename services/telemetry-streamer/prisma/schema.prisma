@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model LapEvent {
+  id             Int      @id @default(autoincrement())
+  raceId         Int
+  driverId       Int
+  driverCode     String
+  position       Int
+  fastestLap     Boolean  @default(false)
+  fastestLapTime String?
+  timestamp      DateTime @default(now())
+
+  @@index([raceId, driverId])
+}
+
+model RaceFinishEvent {
+  id                Int      @id @default(autoincrement())
+  raceId            Int
+  raceName          String
+  season            Int
+  round             Int
+  winnerDriverCode  String
+  winnerDriverName  String
+  winnerTeamName    String
+  totalParticipants Int
+  timestamp         DateTime @default(now())
+}
+
+model TelemetryData {
+  id               Int      @id @default(autoincrement())
+  driverCode       String
+  speed            Int
+  engineRpm        Int
+  brakeTemp        Int
+  ersLevel         Float
+  tireWear         Float
+  timestamp        DateTime @default(now())
+
+  @@index([driverCode, timestamp])
+}

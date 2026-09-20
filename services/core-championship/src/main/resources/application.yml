@@ -7,14 +7,16 @@ spring:
   application:
     name: core-championship
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/pitstop_championship}
-    username: ${SPRING_DATASOURCE_USERNAME:pitstop}
-    password: ${SPRING_DATASOURCE_PASSWORD:pitstop_password}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       mode: always
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     show-sql: true
