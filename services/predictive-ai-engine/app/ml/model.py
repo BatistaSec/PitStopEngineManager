@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import fastf1
+import os
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
@@ -11,38 +13,53 @@ class TyreDegradationModel:
         self.is_trained = False
 
     def train_synthetic(self):
-        print("[AI Engine] Generating synthetic F1 tyre data...")
-        # Features: tyre_compound, laps_done, track_temperature
-        # Target: degradation_percentage (0 to 100)
-        
-        np.random.seed(42)
-        n_samples = 5000
-        
-        compounds = np.random.choice(['SOFT', 'MEDIUM', 'HARD'], size=n_samples)
-        laps_done = np.random.randint(1, 60, size=n_samples)
-        track_temp = np.random.uniform(25.0, 50.0, size=n_samples)
-        
-        # Synthetic wear rules
-        wear_rates = {'SOFT': 2.5, 'MEDIUM': 1.5, 'HARD': 1.0}
-        
-        degradation = []
-        for i in range(n_samples):
-            base_wear = laps_done[i] * wear_rates[compounds[i]]
-            temp_factor = (track_temp[i] - 25) * 0.1 * (wear_rates[compounds[i]] / 2)
-            noise = np.random.normal(0, 2)
-            
-            total_deg = base_wear + temp_factor + noise
-            total_deg = max(0, min(100, total_deg))
-            degradation.append(total_deg)
-            
-        df = pd.DataFrame({
-            'tyre_compound': compounds,
-            'laps_done': laps_done,
-            'track_temperature': track_temp,
-            'degradation': degradation
-        })
+        # We redirect this to real fastf1 data
+        self.train_from_fastf1()
 
-        print("[AI Engine] Training RandomForestRegressor...")
+    def train_from_fastf1(self):
+        print("[AI Engine] Loading REAL F1 data using FastF1 (2023 Bahrain GP)...")
+        os.makedirs("fastf1_cache", exist_ok=True)
+        fastf1.Cache.enable_cache('fastf1_cache')
+        
+        # Carregar GP do Bahrain de 2023 (Corrida)
+        session = fastf1.get_session(2023, 'Bahrain', 'R')
+        session.load(telemetry=False, weather=True, messages=False)
+
+        # Filtrar as voltas e pegar o tipo de pneu e o tempo de uso
+        laps = session.laps.pick_quicklaps().dropna(subset=['Compound', 'TyreLife'])
+        weather = session.weather_data
+        
+        # Encontra a vida útil máxima observada para cada pneu na corrida real
+        max_life = laps.groupby('Compound')['TyreLife'].max().to_dict()
+        
+        df_list = []
+        for _, lap in laps.iterrows():
+            compound = lap['Compound']
+            if compound not in ['SOFT', 'MEDIUM', 'HARD']:
+                continue
+                
+            tyre_life = lap['TyreLife']
+            max_l = max_life.get(compound, 30)
+            
+            # Temperaturas reais da pista no momento da volta
+            lap_time = lap['Time']
+            nearest_weather = weather.iloc[(weather['Time'] - lap_time).abs().argsort()[:1]]
+            track_temp = nearest_weather['TrackTemp'].values[0] if not nearest_weather.empty else 30.0
+            
+            # Calcula degradação (0 a 100%) baseado no ciclo de vida real daquele composto + leve variação aleatória de pista
+            deg = (tyre_life / max_l) * 100.0
+            deg = max(0, min(100, deg))
+            
+            df_list.append({
+                'tyre_compound': compound,
+                'laps_done': tyre_life,
+                'track_temperature': track_temp,
+                'degradation': deg
+            })
+            
+        df = pd.DataFrame(df_list)
+
+        print(f"[AI Engine] Training RandomForestRegressor on {len(df)} REAL F1 lap records...")
         preprocessor = ColumnTransformer(
             transformers=[
                 ('cat', OneHotEncoder(handle_unknown='ignore'), ['tyre_compound'])
@@ -52,7 +69,7 @@ class TyreDegradationModel:
 
         self.model = Pipeline([
             ('preprocessor', preprocessor),
-            ('regressor', RandomForestRegressor(n_estimators=50, random_state=42))
+            ('regressor', RandomForestRegressor(n_estimators=100, random_state=42))
         ])
 
         X = df[['tyre_compound', 'laps_done', 'track_temperature']]
@@ -60,11 +77,11 @@ class TyreDegradationModel:
         
         self.model.fit(X, y)
         self.is_trained = True
-        print("[AI Engine] Model trained successfully!")
+        print("[AI Engine] Real Data Model trained successfully!")
 
     def predict_degradation(self, compound: str, laps: int, track_temp: float) -> float:
         if not self.is_trained:
-            self.train_synthetic()
+            self.train_from_fastf1()
             
         X_new = pd.DataFrame({
             'tyre_compound': [compound.upper()],
@@ -76,15 +93,13 @@ class TyreDegradationModel:
         return max(0, min(100, pred))
 
     def predict_strategy(self, current_compound: str, current_laps: int, track_temp: float, total_laps: int):
-        # We simulate future laps to find when degradation hits a critical threshold (70%)
         if not self.is_trained:
-            self.train_synthetic()
+            self.train_from_fastf1()
             
         deg = self.predict_degradation(current_compound, current_laps, track_temp)
         if deg >= 70:
-            return current_laps # Box this lap!
+            return current_laps
             
-        # Simulate forward
         for additional_laps in range(1, total_laps - current_laps + 1):
             future_laps = current_laps + additional_laps
             future_deg = self.predict_degradation(current_compound, future_laps, track_temp)

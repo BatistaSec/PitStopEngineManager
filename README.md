@@ -24,8 +24,8 @@ O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/Batist
 | **Semana 1** | **Core Championship & Security** | Java 21, Spring Boot 3, Spring Security 6 (JWT), RabbitMQ, PostgreSQL | `Concluído` ✅ |
 | **Semana 2** | **Frontend Pit Wall** | Next.js 16, React 19, TypeScript, TailwindCSS, Recharts, Lucide | `Concluído` ✅ |
 | **Semana 3** | **Telemetria Streamer** | Node.js, Express, SSE, MySQL, Prisma | `Concluído` ✅ |
-| **Semana 4** | **Predictive AI Engine** | Python, FastAPI, Scikit-Learn, Pandas | `Próximo` ⏳ |
-| **Semana 5** | **Infraestrutura & DevOps** | Docker, Docker Compose, GitHub Actions CI/CD, AWS | `Pendente` 🎯 |
+| **Semana 4** | **Predictive AI Engine** | Python, FastAPI, Scikit-Learn, FastF1 (Real Data) | `Concluído` ✅ |
+| **Semana 5** | **Infraestrutura & DevOps** | Docker, Docker Compose, GitHub Actions CI/CD, AWS | `Atual` ⏳ |
 
 ---
 

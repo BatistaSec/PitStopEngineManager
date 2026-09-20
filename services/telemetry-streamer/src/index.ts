@@ -29,33 +29,30 @@ app.get('/api/v1/livetiming/stream', (req: Request, res: Response) => {
   });
 });
 
-// Mocked high-frequency telemetry for demonstration purposes (since core doesn't publish this yet)
+// Live Telemetry SSE endpoint
 app.get('/api/v1/telemetry/stream', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  const drivers = ['VER', 'LEC', 'NOR', 'HAM'];
-
-  const intervalId = setInterval(() => {
-    const data = drivers.map(driverCode => ({
-      driverCode,
-      speed: Math.floor(Math.random() * (340 - 200 + 1) + 200),
-      engineRpm: Math.floor(Math.random() * (12000 - 8000 + 1) + 8000),
-      brakeTemp: Math.floor(Math.random() * (1000 - 400 + 1) + 400),
-      ersLevel: Math.floor(Math.random() * 100),
-      tireWear: Math.floor(Math.random() * 100),
-      timestamp: new Date().toISOString()
-    }));
-    
-    // In a real app, this might also be saved to prisma, but it's too high frequency for this demo
+  const onTelemetry = (data: any) => {
     res.write(`event: telemetry\ndata: ${JSON.stringify(data)}\n\n`);
-  }, 1000);
+  };
+
+  telemetryEvents.on('high_freq_telemetry', onTelemetry);
 
   req.on('close', () => {
-    clearInterval(intervalId);
+    telemetryEvents.off('high_freq_telemetry', onTelemetry);
     res.end();
   });
+});
+
+// Ingest endpoint for Race Simulator (receives REAL FastF1 data)
+app.post('/api/v1/telemetry/ingest', (req: Request, res: Response) => {
+  const telemetryData = req.body;
+  // Broadcast to all connected SSE clients
+  telemetryEvents.emit('high_freq_telemetry', telemetryData);
+  res.json({ status: 'ingested' });
 });
 
 app.get('/health', (req, res) => {

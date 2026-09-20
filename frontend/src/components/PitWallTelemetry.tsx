@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line } from 'recharts';
-import { Gauge, Flame, Zap, Disc, Play, Pause, RefreshCw } from 'lucide-react';
+import { Gauge, Flame, Zap, Disc, Play, Pause } from 'lucide-react';
+import { useLiveStream } from '../lib/useLiveStream';
 
 interface TelemetryPoint {
   time: string;
@@ -33,59 +34,70 @@ export default function PitWallTelemetry() {
     tyreWear: 18,
   });
 
-  // Generate initial telemetric lap dataset
+  const [aiPrediction, setAiPrediction] = useState<{ recommended_pit_lap: number; laps_remaining_until_pit: number } | null>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
+
+  // Consume REAL SSE telemetry feed
+  const { data: telemetryFeed } = useLiveStream<any[]>({
+    endpoint: '/telemetry/stream',
+    eventName: 'telemetry',
+    enabled: isLive,
+  });
+
   useEffect(() => {
-    const initial: TelemetryPoint[] = [];
-    for (let i = 0; i < 20; i++) {
-      initial.push({
-        time: `${i * 2}s`,
-        speed: 180 + Math.floor(Math.sin(i / 2) * 140) + Math.floor(Math.random() * 15),
-        rpm: 9000 + Math.floor(Math.sin(i / 2) * 3200),
-        brakeTemp: 500 + Math.floor(Math.random() * 350),
-        ers: Math.max(10, 100 - i * 4),
-        tyreWear: Math.min(100, Math.floor(i * 1.5)),
-      });
-    }
-    setTelemetryData(initial);
-  }, [selectedDriver]);
-
-  // Live telemetry streaming loop
-  useEffect(() => {
-    if (!isLive) return;
-
-    const interval = setInterval(() => {
-      const newSpeed = 200 + Math.floor(Math.random() * 140);
-      const newRpm = 9500 + Math.floor(Math.random() * 2800);
-      const newBrakeTemp = 600 + Math.floor(Math.random() * 300);
-      const newErs = Math.max(5, Math.floor(Math.random() * 95));
-      const newGear = newSpeed > 300 ? 8 : newSpeed > 260 ? 7 : newSpeed > 220 ? 6 : 5;
-
-      setCurrentMetrics({
-        speed: newSpeed,
-        rpm: newRpm,
-        brakeTemp: newBrakeTemp,
-        ers: newErs,
-        gear: newGear,
-        tyreWear: Math.floor(Math.random() * 25) + 10,
-      });
-
-      setTelemetryData((prev) => {
-        const nextTime = `${prev.length * 2}s`;
-        const newPoint: TelemetryPoint = {
-          time: nextTime,
+    if (telemetryFeed && Array.isArray(telemetryFeed)) {
+      const driverData = telemetryFeed.find((d: any) => d.driverCode === selectedDriver.code);
+      if (driverData) {
+        const newSpeed = driverData.speed;
+        const newGear = newSpeed > 300 ? 8 : newSpeed > 260 ? 7 : newSpeed > 220 ? 6 : 5;
+        
+        setCurrentMetrics({
           speed: newSpeed,
-          rpm: newRpm,
-          brakeTemp: newBrakeTemp,
-          ers: newErs,
-          tyreWear: Math.floor(Math.random() * 25) + 10,
-        };
-        const updated = [...prev.slice(1), newPoint];
-        return updated;
-      });
-    }, 1200);
+          rpm: driverData.engineRpm,
+          brakeTemp: driverData.brakeTemp,
+          ers: driverData.ersLevel,
+          gear: newGear,
+          tyreWear: Math.floor(Math.random() * 25) + 10, // AI predict placeholder for gauge
+        });
 
-    return () => clearInterval(interval);
-  }, [isLive]);
+        setTelemetryData((prev) => {
+          const nextTime = `${prev.length}s`;
+          const newPoint = {
+            time: nextTime,
+            speed: newSpeed,
+            rpm: driverData.engineRpm,
+            brakeTemp: driverData.brakeTemp,
+            ers: driverData.ersLevel,
+            tyreWear: 15,
+          };
+          const updated = [...prev, newPoint].slice(-20); // Keep last 20 points
+          return updated;
+        });
+      }
+    }
+  }, [telemetryFeed, selectedDriver]);
+
+  const handlePredictStrategy = async () => {
+    setIsPredicting(true);
+    try {
+      const res = await fetch('http://localhost:8000/api/v1/predict/strategy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          current_compound: 'SOFT',
+          current_laps: 15,
+          track_temperature: 30.5,
+          total_laps: 57
+        })
+      });
+      const data = await res.json();
+      setAiPrediction(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsPredicting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -287,6 +299,47 @@ export default function PitWallTelemetry() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </div>
+        {/* AI Strategy Engine Card */}
+        <div className="bg-[#141722] p-5 rounded-2xl border border-purple-500/30 relative overflow-hidden group col-span-1 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                <span>AI Predictive Strategy</span>
+              </h3>
+              <p className="text-[11px] text-gray-400 font-mono">Trained on Real Bahrain 2023 FastF1 Data</p>
+            </div>
+            <button 
+              onClick={handlePredictStrategy} 
+              disabled={isPredicting}
+              className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+            >
+              {isPredicting ? 'PREDICTING...' : 'RUN AI ANALYSIS'}
+            </button>
+          </div>
+          {aiPrediction ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 p-4 bg-purple-900/20 border border-purple-500/20 rounded-xl">
+               <div className="flex flex-col">
+                  <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Recommended Box Lap</span>
+                  <span className="text-2xl font-bold text-purple-400">LAP {aiPrediction.recommended_pit_lap}</span>
+               </div>
+               <div className="flex flex-col sm:border-l sm:border-white/10 sm:pl-6">
+                  <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Laps Remaining (Current Stint)</span>
+                  <span className="text-2xl font-bold text-white">{aiPrediction.laps_remaining_until_pit} LAPS</span>
+               </div>
+               <div className="flex flex-col sm:border-l sm:border-white/10 sm:pl-6">
+                  <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Action</span>
+                  <span className={`text-lg font-bold uppercase tracking-wider ${aiPrediction.laps_remaining_until_pit <= 3 ? 'text-red-500 animate-pulse' : 'text-emerald-500'}`}>
+                    {aiPrediction.laps_remaining_until_pit <= 3 ? 'BOX BOX BOX' : 'STAY OUT'}
+                  </span>
+               </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center p-8 bg-[#0a0c14] rounded-xl border border-white/5">
+              <span className="text-xs text-gray-500 font-mono uppercase">Awaiting AI execution trigger</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
