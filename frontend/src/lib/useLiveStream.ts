@@ -14,6 +14,8 @@ interface UseLiveStreamOptions<T> {
   enabled?: boolean;
 }
 
+export const STREAMER_BASE_URL = process.env.NEXT_PUBLIC_STREAMER_URL || 'http://localhost:3001/api/v1';
+
 export function useLiveStream<T>({
   endpoint,
   eventName,
@@ -36,7 +38,7 @@ export function useLiveStream<T>({
     }
 
     try {
-      const url = `${API_BASE_URL}${endpoint}`;
+      const url = `${STREAMER_BASE_URL}${endpoint}`;
       const es = new EventSource(url);
       eventSourceRef.current = es;
 
