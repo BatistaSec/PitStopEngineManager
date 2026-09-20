@@ -86,8 +86,10 @@ export default function PitWallDashboard() {
 
         {/* Dashboard Content */}
         <main className="flex-1 p-3 sm:p-4 md:p-6 w-full mx-auto space-y-4 sm:space-y-6">
-          {/* Weather Simulator Bar on top of active dashboard */}
-          <WeatherSimulator />
+          {/* Weather Simulator Bar - Exclusive to active race & telemetry dashboards */}
+          {['overview', 'livetiming', 'lapevolution', 'pitwall'].includes(activeTab) && (
+            <WeatherSimulator />
+          )}
 
           {activeTab === 'overview' && (
             <div className="space-y-6">

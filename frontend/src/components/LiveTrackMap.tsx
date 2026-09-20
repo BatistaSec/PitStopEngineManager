@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Compass, Navigation, Radio, Play, Pause, Zap } from 'lucide-react';
 import { useLiveStream } from '../lib/useLiveStream';
 
@@ -22,6 +22,7 @@ const DRIVER_COLORS: Record<string, string> = {
 const CIRCUIT_PATH_D = "M 150 400 L 200 120 Q 250 80 320 100 L 500 150 Q 560 170 580 220 L 590 350 Q 590 400 520 420 L 420 440 L 350 320 L 280 430 L 150 400 Z";
 
 export default function LiveTrackMap() {
+  const pathRef = useRef<SVGPathElement | null>(null);
   const [positions, setPositions] = useState<Record<string, DriverPosition>>({
     VER: { driverCode: 'VER', speed: 0, color: '#3671C6', progress: 15 },
     LEC: { driverCode: 'LEC', speed: 0, color: '#E8002D', progress: 32 },
@@ -42,7 +43,7 @@ export default function LiveTrackMap() {
         telemetryFeed.forEach((d: any) => {
           if (d.driverCode && next[d.driverCode]) {
             const currentProg = next[d.driverCode].progress;
-            const deltaProg = Math.max(0.2, (d.speed || 150) / 1200);
+            const deltaProg = Math.max(0.15, (d.speed || 150) / 1400);
             next[d.driverCode] = {
               ...next[d.driverCode],
               speed: d.speed,
@@ -55,19 +56,20 @@ export default function LiveTrackMap() {
     }
   }, [telemetryFeed]);
 
-  // Interpolate SVG path coordinates for progress 0-100%
+  // Calculate EXACT coordinates along SVG asphalt path
   const getCoordinatesForProgress = (progPercent: number) => {
-    // Standard parametric points along Sakhir layout
+    if (pathRef.current) {
+      try {
+        const totalLength = pathRef.current.getTotalLength();
+        const distance = (progPercent / 100) * totalLength;
+        const pt = pathRef.current.getPointAtLength(distance);
+        return { x: pt.x, y: pt.y };
+      } catch (err) {
+        // fallback
+      }
+    }
     const rad = (progPercent / 100) * 2 * Math.PI;
-    const cx = 360;
-    const cy = 260;
-    const rx = 200;
-    const ry = 140;
-    
-    // Deformed oval reflecting Sakhir's outer loop
-    const x = cx + rx * Math.cos(rad) + 30 * Math.sin(2 * rad);
-    const y = cy + ry * Math.sin(rad) + 20 * Math.cos(3 * rad);
-    return { x, y };
+    return { x: 360 + 180 * Math.cos(rad), y: 260 + 120 * Math.sin(rad) };
   };
 
   return (
@@ -116,6 +118,7 @@ export default function LiveTrackMap() {
           />
           {/* Main Asphalt Path */}
           <path
+            ref={pathRef}
             d={CIRCUIT_PATH_D}
             fill="none"
             stroke="#262c40"
