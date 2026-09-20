@@ -25,6 +25,7 @@ export default function PitWallDashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSimulationActive, setIsSimulationActive] = useState(true);
   const token = getAuthToken();
   const username = typeof window !== 'undefined' ? localStorage.getItem('pitstop_username') : null;
 
@@ -88,27 +89,30 @@ export default function PitWallDashboard() {
         <main className="flex-1 p-3 sm:p-4 md:p-6 w-full mx-auto space-y-4 sm:space-y-6">
           {/* Weather Simulator Bar - Exclusive to active race & telemetry dashboards */}
           {['overview', 'livetiming', 'lapevolution', 'pitwall'].includes(activeTab) && (
-            <WeatherSimulator />
+            <WeatherSimulator 
+              isReplayActive={isSimulationActive} 
+              onReplayToggle={(active) => setIsSimulationActive(active)} 
+            />
           )}
 
           {activeTab === 'overview' && (
             <div className="space-y-6">
               <OverviewDashboard />
-              <LiveTrackMap />
+              <LiveTrackMap isEnabled={isSimulationActive} />
             </div>
           )}
-          {activeTab === 'livetiming' && <LiveTiming />}
+          {activeTab === 'livetiming' && <LiveTiming isEnabled={isSimulationActive} />}
           {activeTab === 'lapevolution' && (
             <div className="space-y-6">
-              <DriverComparison />
+              <DriverComparison isEnabled={isSimulationActive} />
               <OverviewDashboard />
             </div>
           )}
           {activeTab === 'pitwall' && (
             <div className="space-y-6">
-              <LiveTrackMap />
-              <PitWallTelemetry />
-              <DriverComparison />
+              <LiveTrackMap isEnabled={isSimulationActive} />
+              <PitWallTelemetry isEnabled={isSimulationActive} />
+              <DriverComparison isEnabled={isSimulationActive} />
             </div>
           )}
           {activeTab === 'paddock' && <PaddockMarket />}

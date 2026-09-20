@@ -70,11 +70,15 @@ const TEAM_COLORS: Record<string, string> = {
   'Cadillac': 'border-l-[#FFD700]',
 };
 
-export default function LiveTiming() {
+interface LiveTimingProps {
+  isEnabled?: boolean;
+}
+
+export default function LiveTiming({ isEnabled = true }: LiveTimingProps) {
   const { data, isConnected, error } = useLiveStream<LiveTimingData>({
     endpoint: '/livetiming/stream',
     eventName: 'livetiming',
-    enabled: true,
+    enabled: isEnabled,
   });
 
   const trackStatus = useMemo(() => {

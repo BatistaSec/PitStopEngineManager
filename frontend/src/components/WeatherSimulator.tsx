@@ -7,9 +7,11 @@ export type WeatherMode = 'DRY' | 'INTERMEDIATE' | 'WET';
 
 interface WeatherSimulatorProps {
   onWeatherChange?: (mode: WeatherMode, temp: number) => void;
+  isReplayActive?: boolean;
+  onReplayToggle?: (active: boolean) => void;
 }
 
-export default function WeatherSimulator({ onWeatherChange }: WeatherSimulatorProps) {
+export default function WeatherSimulator({ onWeatherChange, isReplayActive = true, onReplayToggle }: WeatherSimulatorProps) {
   const [mode, setMode] = useState<WeatherMode>('DRY');
   const [trackTemp, setTrackTemp] = useState<number>(32);
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
@@ -68,11 +70,9 @@ export default function WeatherSimulator({ onWeatherChange }: WeatherSimulatorPr
     if (onWeatherChange) onWeatherChange(newMode, newTemp);
   };
 
-  const [isReplayActive, setIsReplayActive] = useState<boolean>(true);
-
   const toggleReplay = () => {
     const nextState = !isReplayActive;
-    setIsReplayActive(nextState);
+    if (onReplayToggle) onReplayToggle(nextState);
     if (!nextState) {
       playPitRadio('Replay simulation paused by user control.');
     } else {

@@ -21,9 +21,12 @@ const DRIVERS = [
   { id: 4, name: 'Lewis Hamilton', code: 'HAM', team: 'Mercedes AMG', color: '#6CD3BF', number: 44 },
 ];
 
-export default function PitWallTelemetry() {
+interface PitWallTelemetryProps {
+  isEnabled?: boolean;
+}
+
+export default function PitWallTelemetry({ isEnabled = true }: PitWallTelemetryProps) {
   const [selectedDriver, setSelectedDriver] = useState(DRIVERS[0]);
-  const [isLive, setIsLive] = useState(true);
   const [telemetryData, setTelemetryData] = useState<TelemetryPoint[]>([]);
   const [currentMetrics, setCurrentMetrics] = useState({
     speed: 0,
@@ -41,10 +44,22 @@ export default function PitWallTelemetry() {
   const { data: telemetryFeed } = useLiveStream<any[]>({
     endpoint: '/telemetry/stream',
     eventName: 'telemetry',
-    enabled: isLive,
+    enabled: isEnabled,
   });
 
   useEffect(() => {
+    if (!isEnabled) {
+      setCurrentMetrics({
+        speed: 0,
+        rpm: 0,
+        brakeTemp: 0,
+        ers: 0,
+        gear: 0,
+        tyreWear: 0,
+      });
+      setTelemetryData([]);
+      return;
+    }
     if (telemetryFeed && Array.isArray(telemetryFeed)) {
       const driverData = telemetryFeed.find((d: any) => d.driverCode === selectedDriver.code);
       if (driverData) {

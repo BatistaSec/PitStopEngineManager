@@ -21,7 +21,11 @@ const DRIVER_COLORS: Record<string, string> = {
 // Bahrain International Circuit SVG Path Coordinates
 const CIRCUIT_PATH_D = "M 150 400 L 200 120 Q 250 80 320 100 L 500 150 Q 560 170 580 220 L 590 350 Q 590 400 520 420 L 420 440 L 350 320 L 280 430 L 150 400 Z";
 
-export default function LiveTrackMap() {
+interface LiveTrackMapProps {
+  isEnabled?: boolean;
+}
+
+export default function LiveTrackMap({ isEnabled = true }: LiveTrackMapProps) {
   const pathRef = useRef<SVGPathElement | null>(null);
   const [positions, setPositions] = useState<Record<string, DriverPosition>>({
     VER: { driverCode: 'VER', speed: 0, color: '#3671C6', progress: 15 },
@@ -33,10 +37,20 @@ export default function LiveTrackMap() {
   const { data: telemetryFeed } = useLiveStream<any[]>({
     endpoint: '/telemetry/stream',
     eventName: 'telemetry',
-    enabled: true,
+    enabled: isEnabled,
   });
 
   useEffect(() => {
+    if (!isEnabled) {
+      setPositions((prev) => {
+        const resetPos = { ...prev };
+        Object.keys(resetPos).forEach((key) => {
+          resetPos[key] = { ...resetPos[key], speed: 0 };
+        });
+        return resetPos;
+      });
+      return;
+    }
     if (telemetryFeed && Array.isArray(telemetryFeed)) {
       setPositions((prev) => {
         const next = { ...prev };

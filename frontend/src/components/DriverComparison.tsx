@@ -20,7 +20,11 @@ interface ComparisonPoint {
   driver2Brake: number;
 }
 
-export default function DriverComparison() {
+interface DriverComparisonProps {
+  isEnabled?: boolean;
+}
+
+export default function DriverComparison({ isEnabled = true }: DriverComparisonProps) {
   const [driver1, setDriver1] = useState(DRIVER_OPTIONS[0]); // VER
   const [driver2, setDriver2] = useState(DRIVER_OPTIONS[1]); // LEC
   const [chartData, setChartData] = useState<ComparisonPoint[]>([]);
@@ -28,10 +32,14 @@ export default function DriverComparison() {
   const { data: telemetryFeed } = useLiveStream<any[]>({
     endpoint: '/telemetry/stream',
     eventName: 'telemetry',
-    enabled: true,
+    enabled: isEnabled,
   });
 
   useEffect(() => {
+    if (!isEnabled) {
+      setChartData([]);
+      return;
+    }
     if (telemetryFeed && Array.isArray(telemetryFeed)) {
       const d1Data = telemetryFeed.find((d: any) => d.driverCode === driver1.code);
       const d2Data = telemetryFeed.find((d: any) => d.driverCode === driver2.code);
