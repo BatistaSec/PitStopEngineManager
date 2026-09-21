@@ -39,6 +39,7 @@ export default function PitWallTelemetry({ isEnabled = true }: PitWallTelemetryP
 
   const [aiPrediction, setAiPrediction] = useState<{ recommended_pit_lap: number; laps_remaining_until_pit: number } | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
+  const [isLive, setIsLive] = useState(true);
 
   // Consume REAL SSE telemetry feed
   const { data: telemetryFeed } = useLiveStream<any[]>({

@@ -26,7 +26,7 @@ for driver in drivers:
 
 print("[Race Simulator] Ready! Starting real-time stream to Telemetry Streamer...")
 
-TELEMETRY_URL = "http://localhost:3001/api/v1/telemetry/ingest"
+TELEMETRY_URL = os.getenv("TELEMETRY_URL", "http://localhost:3001/api/v1/telemetry/ingest")
 
 # FastF1 telemetry is sampled at ~10Hz. We take every 10th row for a 1Hz update rate
 if len(telemetry_data) > 0:
