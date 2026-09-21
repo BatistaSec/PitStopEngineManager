@@ -1,7 +1,9 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectRabbitMQ, telemetryEvents } from './services/rabbitmq.service';
+import http from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
+import { connectRabbitMQ, telemetryEvents, getRabbitChannel } from './services/rabbitmq.service';
 
 dotenv.config();
 
@@ -9,93 +11,96 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server, path: '/ws/telemetry' });
+
 const PORT = process.env.PORT || 3001;
 
-// Endpoint for SSE Livetiming
-app.get('/api/v1/livetiming/stream', (req: Request, res: Response) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+// --- WebSockets Connection Management ---
+const clients = new Set<WebSocket>();
 
-  const onLiveTiming = (data: any) => {
-    res.write(`event: livetiming\ndata: ${JSON.stringify(data)}\n\n`);
-  };
+wss.on('connection', (ws) => {
+  console.log('[WebSocket] Client connected');
+  clients.add(ws);
 
-  telemetryEvents.on('livetiming', onLiveTiming);
-
-  req.on('close', () => {
-    telemetryEvents.off('livetiming', onLiveTiming);
-    res.end();
+  ws.on('close', () => {
+    clients.delete(ws);
+    console.log('[WebSocket] Client disconnected');
   });
 });
 
-// Live Telemetry SSE endpoint
-app.get('/api/v1/telemetry/stream', (req: Request, res: Response) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+// Broadcast helper
+const broadcastWs = (event: string, data: any) => {
+  const message = JSON.stringify({ event, data });
+  for (const client of clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+};
 
-  const onTelemetry = (data: any) => {
-    res.write(`event: telemetry\ndata: ${JSON.stringify(data)}\n\n`);
-  };
+// Listen to RabbitMQ events and broadcast
+telemetryEvents.on('livetiming', (data) => broadcastWs('livetiming', data));
+telemetryEvents.on('high_freq_telemetry', (data) => broadcastWs('telemetry', data));
 
-  telemetryEvents.on('high_freq_telemetry', onTelemetry);
 
-  req.on('close', () => {
-    telemetryEvents.off('high_freq_telemetry', onTelemetry);
-    res.end();
-  });
-});
+// --- Ingestion Engine: Buffer & Micro-batching ---
+const BATCH_INTERVAL_MS = 100;
+let telemetryBuffer: any[] = [];
 
-// Ingest endpoint for Race Simulator (receives REAL FastF1 data)
+// Micro-batch processor
+setInterval(() => {
+  if (telemetryBuffer.length === 0) return;
+
+  const batch = [...telemetryBuffer];
+  telemetryBuffer = []; // Clear buffer
+
+  // 1. Publish to RabbitMQ Topic Exchange (telemetry.car.{carId}.sector.{sectorId})
+  const channel = getRabbitChannel();
+  if (channel) {
+    batch.forEach(item => {
+      const routingKey = `telemetry.car.${item.driverCode}.sector.${item.sector || 1}`;
+      channel.publish('f1.telemetry.topic', routingKey, Buffer.from(JSON.stringify(item)));
+    });
+  }
+
+  // 2. Fast broadcast to clients
+  broadcastWs('telemetry', batch);
+  console.log(`[Ingestion] Processed micro-batch of ${batch.length} messages`);
+}, BATCH_INTERVAL_MS);
+
+// High-Throughput Ingestion Endpoint
 app.post('/api/v1/telemetry/ingest', (req: Request, res: Response) => {
   const telemetryData = req.body;
   
-  // 1. Broadcast to high frequency telemetry clients (PitWall)
-  telemetryEvents.emit('high_freq_telemetry', telemetryData);
-
-  // 2. Build and broadcast live timing structure for LiveTiming Tower & Overview
-  if (Array.isArray(telemetryData) && telemetryData.length > 0) {
-    const currentLap = Math.floor(Math.random() * 5) + 15; // Lap around 15-20
-    const liveTimingPayload = {
-      timestamp: Date.now(),
-      currentLap: currentLap,
-      totalLaps: 57,
-      trackStatus: 'GREEN',
-      sessionTime: '1:31.245',
-      timing: telemetryData.map((driver: any, idx: number) => ({
-        position: idx + 1,
-        number: driver.driverCode === 'VER' ? '1' : driver.driverCode === 'LEC' ? '16' : driver.driverCode === 'NOR' ? '4' : '44',
-        code: driver.driverCode,
-        driver: driver.driverCode === 'VER' ? 'Max Verstappen' : driver.driverCode === 'LEC' ? 'Charles Leclerc' : driver.driverCode === 'NOR' ? 'Lando Norris' : 'Lewis Hamilton',
-        team: driver.driverCode === 'VER' ? 'Red Bull Racing' : driver.driverCode === 'LEC' ? 'Scuderia Ferrari' : driver.driverCode === 'NOR' ? 'McLaren F1 Team' : 'Mercedes AMG',
-        gap: idx === 0 ? 'LEADER' : `+${(idx * 2.412).toFixed(3)}s`,
-        interval: idx === 0 ? '-' : `+${(2.412).toFixed(3)}s`,
-        lastLap: '1:36.512',
-        bestLap: '1:34.288',
-        s1: '29.1',
-        s1Color: 'GREEN',
-        s2: '39.8',
-        s2Color: 'PURPLE',
-        s3: '24.6',
-        s3Color: 'GREEN',
-        tyre: idx % 2 === 0 ? 'SOFT' : 'MEDIUM',
-        tyreAge: currentLap,
-        pits: 1,
-        status: 'TRACK'
-      }))
-    };
-    telemetryEvents.emit('livetiming', liveTimingPayload);
+  // Backpressure mechanism: Prevent memory bloat
+  if (telemetryBuffer.length > 5000) {
+    return res.status(429).json({ error: 'Buffer full (Backpressure applied)' });
   }
 
-  res.json({ status: 'ingested' });
+  if (Array.isArray(telemetryData)) {
+    telemetryBuffer.push(...telemetryData);
+  } else {
+    telemetryBuffer.push(telemetryData);
+  }
+
+  res.status(202).json({ status: 'buffered' });
 });
+
+
+// --- CQRS Sync Worker ---
+// Assuming rabbitmq.service is updated to bind to 'outbox.events' queue
+telemetryEvents.on('outbox_sync', (eventPayload) => {
+  console.log('[CQRS] Syncing outbox event to MySQL Read Replica:', eventPayload);
+  // TODO: Use Prisma to update MySQL based on eventType and payload from Java Command Stack
+});
+
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(PORT, () => {
-  console.log(`[Express] Telemetry Streamer running on port ${PORT}`);
-  connectRabbitMQ();
+server.listen(PORT, () => {
+  console.log(`[Express/WS] Telemetry Streamer running on port ${PORT}`);
+  connectRabbitMQ(); // Make sure this creates 'f1.telemetry.topic' exchange
 });

@@ -11,131 +11,129 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/BatistaSec/PitStopEngineManager)) é uma plataforma de alta performance desenvolvida em arquitetura distribuída de microserviços. O sistema combina gestão oficial de campeonatos de Fórmula 1, um **Pit Wall Dashboard em Next.js 16**, telemetria em tempo real via WebSockets, inteligência artificial preditiva para estratégias de pit stop e segurança com JWT.
+O **PitStopEngine** ([BatistaSec/PitStopEngineManager](https://github.com/BatistaSec/PitStopEngineManager)) é uma **Engine de Simulação e Telemetria em Alta Escala** com arquitetura de Missão Crítica. 
+
+Ele lida com telemetria em altíssima frequência (20 Hz por carro) utilizando padrões de engenharia de software avançados (CQRS, Outbox Pattern, Micro-batching, Web Workers) para fornecer uma experiência incrivelmente rápida e robusta, similar às tecnologias usadas em equipes reais.
 
 📍 **Repositório Oficial:** [github.com/BatistaSec/PitStopEngineManager](https://github.com/BatistaSec/PitStopEngineManager)
 
 ---
 
-## 🗺️ Roadmap de Desenvolvimento (5 Semanas)
+## 🎮 O que este projeto faz na prática?
 
-| Semana | Módulo / Serviço | Tecnologias | Status |
-| :--- | :--- | :--- | :---: |
-| **Semana 1** | **Core Championship & Security** | Java 21, Spring Boot 3, Spring Security 6 (JWT), RabbitMQ, PostgreSQL | `Concluído` ✅ |
-| **Semana 2** | **Frontend Pit Wall** | Next.js 16, React 19, TypeScript, TailwindCSS, Recharts, Lucide | `Concluído` ✅ |
-| **Semana 3** | **Telemetria Streamer** | Node.js, Express, SSE, MySQL, Prisma | `Concluído` ✅ |
-| **Semana 4** | **Predictive AI Engine** | Python, FastAPI, Scikit-Learn, FastF1 (Real Data) | `Concluído` ✅ |
-| **Semana 5** | **Infraestrutura & DevOps** | Docker, Docker Compose, GitHub Actions CI/CD, AWS | `Atual` ⏳ |
+Imagine que você é o engenheiro chefe de uma equipe de Fórmula 1, sentado no "Pit Wall" (aquele painel cheio de monitores na beira da pista).
+- **O que você vê:** Um painel bonito e rápido desenhado a 60 FPS mostrando os gráficos do carro (velocidade, freios, pneus) ao vivo, além da tabela de classificação de todos os pilotos.
+- **O que acontece por trás das câmeras:** Os carros geram centenas de informações por segundo. Nosso sistema recebe tudo isso via WebSockets, organiza em lotes para não travar os servidores, arquiva de forma segura, analisa usando **Simulações de Inteligência Artificial** para prever a hora certa de fazer um pit stop e despacha para a sua tela instantaneamente.
 
 ---
 
-## 💻 Semana 2: Frontend Pit Wall Dashboard (`frontend/`)
+## 🏗️ Arquitetura de Missão Crítica (Para que serve cada ferramenta?)
 
-O **Pit Wall Monitor** é o painel frontal interativo do sistema desenvolvido com **Next.js 16 (App Router)** e **TailwindCSS v4**:
+Nós dividimos esse sistema em partes menores, usando padrões de nível Sênior/Arquiteto para suportar uma carga absurda de dados sem travar:
 
-- **📊 Live Telemetry Monitor (Recharts):**
-  - Gráficos em tempo real de Velocidade (km/h), RPM do Motor, Temperatura de Freios (°C), Nível de ERS (%) e Desgaste de Pneus (%).
-  - Seletor ao vivo de pilotos de topo da F1 (Max Verstappen `#1`, Charles Leclerc `#16`, Lando Norris `#4`, Lewis Hamilton `#44`).
-- **🏆 Classificação Oficial (Standings Portal):**
-  - Tabelas integradas de *Driver Standings* e *Constructor Standings* conectadas em tempo real à API REST (`/api/v1/standings/drivers` e `/teams`).
-- **📅 Calendário de GPs:**
-  - Exibição de corridas da temporada 2026 com circuitos e status de conclusão.
-- **🔑 Autenticação & Modal JWT:**
-  - Login e registro de usuários com armazenamento seguro do Token JWT Bearer no `localStorage` para criação e modificação de equipes.
-
----
-
-## 📡 Semana 3: Telemetria Streamer (`services/telemetry-streamer/`)
-
-O **Telemetria Streamer** é o microserviço Node.js responsável por conectar o backend à interface em tempo real via **Server-Sent Events (SSE)**.
-
-- **📊 Server-Sent Events (SSE):**
-  - Integração contínua e leve com o Frontend (`useLiveStream`) sem a complexidade de WebSockets bi-direcionais.
-- **🐇 Consumo de Eventos (RabbitMQ):**
-  - Escuta a exchange `f1.events` e repassa os eventos de `LapRegisteredEvent` e `RaceFinishedEvent` ao frontend.
-- **🗄️ MySQL & Prisma ORM:**
-  - Armazenamento persistente e tipado com TypeScript para registrar histórico de resultados de corridas e telemetria de voltas.
+* **🖼️ Next.js, Web Workers e Canvas API (A Interface Visual - Frontend)**
+  * **O que faz:** É o "Pit Wall". Para não travar seu navegador recebendo milhares de dados por segundo, o site delega a matemática pesada (parsing) para um **Web Worker** invisível e desenha a pista usando **Canvas API nativa** a 60 FPS, ignorando os travamentos comuns de sites tradicionais.
+* **⚙️ Java e Spring Boot (O Cérebro Seguro - Backend)**
+  * **O que faz:** O "juiz intocável" do campeonato. Ele usa o padrão de **Sagas** para garantir que uma penalidade ou Safety Car seja aplicada corretamente. Além disso, usa o **Outbox Pattern**: sempre que ele salva algo no banco, ele garante 100% de certeza que o resto do sistema será avisado, sem nunca perder uma mensagem (Consistência Distribuída).
+* **📡 Node.js e WebSockets (A Turbina de Ingestão - Telemetria Streamer)**
+  * **O que faz:** Um aspirador de dados super potente. Ele recebe a telemetria via WebSockets e usa **Micro-batching** e **Backpressure**: em vez de se engasgar processando dado por dado, ele agrupa milhares de dados em pequenos pacotes de 100ms e os joga adiante, garantindo que a memória RAM do servidor nunca estoure.
+* **🧠 Python e FastAPI (A Inteligência Artificial Preditiva)**
+  * **O que faz:** Trabalha como um "estrategista matemático". Ele roda **Simulações de Monte Carlo** — testando 10.000 cenários de pit stops simultâneos a cada evento na pista — e usa **Rolling Windows** no Pandas para detectar imediatamente se um pneu está furando com base na queda de pressão.
+* **🐰 RabbitMQ (O Correio Expresso - Mensageria)**
+  * **O que faz:** É o sistema nervoso central. Todos os sistemas acima conversam por aqui usando canais de alta velocidade (*Topic Exchanges*), garantindo que a comunicação entre o Java, Node e Python flua em milissegundos.
+* **🗄️ PostgreSQL e MySQL (Os Armazéns - CQRS)**
+  * **O que faz:** Aplicamos o padrão **CQRS** (Separação de Leitura e Escrita). O **PostgreSQL** é o cofre ultra-seguro para gravar dados oficiais (Command), enquanto o **MySQL** armazena cópias desnormalizadas focadas 100% em leitura rápida (Query).
+* **🐳 Docker e Docker Compose (A Caixa de Ferramentas)**
+  * **O que faz:** Empacota toda essa infraestrutura complexa em "contêineres digitais". Você roda um único comando, e ele liga todos os motores para você perfeitamente.
 
 ---
 
-## 📚 Documentação das APIs REST (`/api/v1`)
+## 🚀 Como Executar o Projeto no Seu Computador (Passo a Passo Leigo)
 
-### 🔐 1. Autenticação & Usuários (`/api/v1/auth`)
-- `POST /api/v1/auth/register`: Registro de usuários (`ROLE_ADMIN` / `ROLE_USER`).
-- `POST /api/v1/auth/login`: Autenticação e emissão do Token JWT Bearer.
+Para rodar este projeto na sua máquina local, você precisa ter instalado:
+1. [Docker Desktop](https://www.docker.com/products/docker-desktop/) *(Mantenha o aplicativo aberto no Windows!)*
+2. [Node.js](https://nodejs.org/) *(Necessário para rodar a página web)*
+3. [Java 21](https://adoptium.net/) e o Maven *(Necessário para rodar o cérebro do sistema)*
 
-### 🏎️ 2. Escuderias (`/api/v1/teams`)
-- `GET /api/v1/teams`: Listar escuderias (Público).
-- `POST /api/v1/teams`: Cadastrar escuderia (Requer Bearer Token JWT `ROLE_ADMIN`).
-- `PUT /api/v1/teams/{id}`: Atualizar escuderia (Requer Bearer Token JWT `ROLE_ADMIN`).
-- `DELETE /api/v1/teams/{id}`: Remover escuderia (Requer Bearer Token JWT `ROLE_ADMIN`).
-
-### 👤 3. Pilotos (`/api/v1/drivers`)
-- `GET /api/v1/drivers`: Listar pilotos (Público).
-- `POST /api/v1/drivers`: Cadastrar piloto (Requer Bearer Token JWT `ROLE_ADMIN`).
-- `PUT /api/v1/drivers/{id}`: Atualizar piloto (Requer Bearer Token JWT `ROLE_ADMIN`).
-- `DELETE /api/v1/drivers/{id}`: Remover piloto (Requer Bearer Token JWT `ROLE_ADMIN`).
-
-### 📡 3.5. Telemetria e Live Timing (SSE)
-- `GET /api/v1/livetiming/stream`: Stream SSE em tempo real de posições, gaps e setores (Público).
-- `GET /api/v1/telemetry/stream`: Stream SSE de telemetria de alta frequência (Público).
-
-### 🏁 4. Circuitos (`/api/v1/circuits`)
-- `GET /api/v1/circuits`: Listar circuitos.
-- `POST /api/v1/circuits`: Cadastrar circuito.
-
-### 🏆 5. Corridas & Resultados (`/api/v1/races`)
-- `GET /api/v1/races?season=2026`: Listar GPs da temporada.
-- `POST /api/v1/races`: Cadastrar GP.
-- `POST /api/v1/races/{raceId}/results`: Registrar resultados + dispara eventos no RabbitMQ.
-
-### 📊 6. Tabelas de Classificação (`/api/v1/standings`)
-- `GET /api/v1/standings/drivers?season=2026`: Classificação oficial de Pilotos.
-- `GET /api/v1/standings/teams?season=2026`: Classificação oficial de Construtores.
-
----
-
-## 🐇 Eventos em Tempo Real (RabbitMQ)
-
-- **Topic Exchange:** `f1.events`
-  - Fila `f1.race.results.queue` (Routing Key: `f1.race.finished`)
-  - Fila `f1.telemetry.laps.queue` (Routing Key: `f1.lap.registered`)
-
----
-
-## 🚀 Como Executar o Projeto Localmente
-
-### 1. Iniciar os Serviços Docker (PostgreSQL, MySQL & RabbitMQ)
+### Passo 1: Ligar a infraestrutura (Bancos de Dados e RabbitMQ)
+Abra o seu terminal (Prompt de Comando ou PowerShell) na pasta principal do projeto e digite:
 ```bash
 docker-compose up -d
 ```
+*💡 O que isso faz? Liga os bancos de dados e o sistema de mensagens escondido em segundo plano.*
 
-### 2. Executar o Backend Core (Spring Boot)
+### Passo 2: Ligar o Cérebro (Sistema de Gestão - Java)
+Abra um **novo terminal** na mesma pasta principal e digite:
 ```bash
 cd services/core-championship
 mvn spring-boot:run
 ```
+*💡 O que isso faz? Liga o sistema que controla as equipes e pilotos.*
 
-### 3. Executar o Telemetria Streamer (Node.js)
+### Passo 3: Ligar a Turbina de Ingestão (Node.js)
+Abra um **terceiro terminal** na pasta principal e digite:
 ```bash
 cd services/telemetry-streamer
 npm install
 npx prisma db push
 npx tsx src/index.ts
 ```
+*💡 O que isso faz? Liga o Micro-batching que vai processar os dados massivos sem travar.*
 
-### 4. Executar o Frontend (Next.js Pit Wall Dashboard)
+### Passo 4: Ligar o Visual de Alta Performance (Next.js)
+Abra um **quarto terminal** na pasta principal e digite:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-📍 **Acesse no navegador:** [http://localhost:3000](http://localhost:3000)
+*💡 O que isso faz? Liga a interface do site no seu computador!*
+
+📍 **Tudo pronto! Agora acesse no seu navegador o endereço:** [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🗺️ Progresso do Projeto (Roadmap)
+
+Aqui você consegue ver o andamento da construção de cada parte:
+
+| Semana | Parte do Sistema | Tecnologias Usadas | Status |
+| :--- | :--- | :--- | :---: |
+| **Semana 1** | **Cérebro Principal e Outbox** | Java 21, Spring Boot, RabbitMQ, PostgreSQL | `Concluído` ✅ |
+| **Semana 2** | **O Site (Painel Pit Wall 60FPS)** | Next.js, React, TailwindCSS, Canvas API | `Concluído` ✅ |
+| **Semana 3** | **Sistema de Transmissão (Micro-batching)** | Node.js, Express, WebSockets, MySQL | `Concluído` ✅ |
+| **Semana 4** | **Motor de Inteligência (Monte Carlo)** | Python, FastAPI, Pandas | `Concluído` ✅ |
+| **Semana 5** | **Infraestrutura e Nuvem (DevOps)** | Docker, GitHub Actions, Nuvem AWS | `Atual` ⏳ |
+
+---
+
+## 📚 Documentação para Programadores (APIs REST)
+
+*(Rotas disponíveis no sistema Core)*
+
+### 1. Autenticação e Usuários (`/api/v1/auth`)
+- `POST /api/v1/auth/register`: Cadastro de usuários (Administrador / Comum).
+- `POST /api/v1/auth/login`: Fazer login e receber a chave de segurança (Token JWT).
+
+### 2. Gestão de Equipes (`/api/v1/teams`)
+- `GET /api/v1/teams`: Ver a lista de equipes abertamente.
+- `POST /api/v1/teams`: Adicionar nova equipe (Apenas Administradores).
+
+### 3. Gestão de Pilotos (`/api/v1/drivers`)
+- `GET /api/v1/drivers`: Ver a lista de pilotos abertamente.
+- `POST /api/v1/drivers`: Adicionar novo piloto (Apenas Administradores).
+
+### 4. Transmissão Ao Vivo (`/ws/telemetry`)
+- `WS /ws/telemetry`: Conexão WebSocket de baixa latência para renderização na Canvas API.
+
+### 5. Sistema de Classificação (`/api/v1/standings`)
+- `GET /api/v1/standings/drivers?season=2026`: Tabela oficial de classificação dos pilotos.
+- `GET /api/v1/standings/teams?season=2026`: Tabela oficial de construtores (Equipes).
 
 ---
 
 ## 📝 Licença
 
-Este projeto é desenvolvido sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto é desenvolvido sob a licença **MIT** (Código aberto para uso). Veja o arquivo `LICENSE` para mais detalhes.
 
 👨‍💻 Desenvolvido por [BatistaSec](https://github.com/BatistaSec).
